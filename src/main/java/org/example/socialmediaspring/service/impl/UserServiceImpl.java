@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
@@ -35,6 +37,7 @@ public class UserServiceImpl implements UserService {
                 .userName(request.getUserName())
                 .address(request.getAddress())
                 .email(request.getEmail())
+                .userName(request.getEmail())
                 .build();
 
         UserEntity saveUser = userRepository.save(user);
@@ -77,6 +80,5 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(
                 userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
     }
-
 
 }

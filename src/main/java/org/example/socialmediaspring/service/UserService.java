@@ -4,6 +4,9 @@ import org.example.socialmediaspring.dto.ApiResponse;
 import org.example.socialmediaspring.dto.CreateUserRequest;
 import org.example.socialmediaspring.dto.UpdateUserRequest;
 import org.example.socialmediaspring.dto.UserResponse;
+import org.example.socialmediaspring.entity.UserEntity;
+
+import java.util.Optional;
 
 public interface UserService {
     UserResponse createUser(CreateUserRequest request);
@@ -13,4 +16,5 @@ public interface UserService {
     void deleteUser(Long userId);
 
     UserResponse getUser(Long userId);
+
 }

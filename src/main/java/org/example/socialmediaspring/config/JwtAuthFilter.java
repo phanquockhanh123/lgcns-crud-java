@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.socialmediaspring.service.TokenBlackListService;
 import org.example.socialmediaspring.service.UserDetailsEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +24,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private JWTUtils jwtUtils;
     @Autowired
     private UserDetailsEntityService userService;
+    @Autowired
+    private TokenBlackListService tokenBlackListService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -37,6 +40,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         jwtToken = authHeader.substring(7);
         userEmail = jwtUtils.extractUsername(jwtToken);
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (tokenBlackListService.isTokenBlacklisted(jwtToken)) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token has been blacklisted");
+                return;
+            }
+
             UserDetails userDetails = userService.loadUserByUsername(userEmail);
 
             if (jwtUtils.isTokenValid(jwtToken, userDetails)) {

@@ -1,21 +1,19 @@
 package org.example.socialmediaspring.service.impl;
 
-import org.apache.catalina.User;
-import org.example.socialmediaspring.dto.ApiResponse;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.example.socialmediaspring.dto.CreateUserRequest;
 import org.example.socialmediaspring.dto.UpdateUserRequest;
 import org.example.socialmediaspring.dto.UserResponse;
 import org.example.socialmediaspring.entity.UserEntity;
-import org.example.socialmediaspring.exception.AppException;
-import org.example.socialmediaspring.exception.ErrorCode;
+import org.example.socialmediaspring.exception.ExceptionResponse;
+import org.example.socialmediaspring.exception.BusinessErrorCodes;
 import org.example.socialmediaspring.mapper.UserMapper;
 import org.example.socialmediaspring.repository.UserRepository;
 import org.example.socialmediaspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -28,7 +26,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse createUser(CreateUserRequest request) {
         if (userRepository.existsByUserNameOrEmail(request.getUserName(), request.getEmail())) {
-            throw new AppException(ErrorCode.USER_EXISTED);
+            throw new EntityExistsException("User existed");
         }
 
         UserEntity user  = UserEntity.builder()
@@ -63,13 +61,13 @@ public class UserServiceImpl implements UserService {
                     UserResponse rs = userMapper.toUserResponse(newUser);
                     return rs;
                 })
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                .orElseThrow(() -> new EntityNotFoundException("User existed"));
     }
 
     @Override
     public void deleteUser(Long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+            throw new EntityNotFoundException("User not existed");
         }
 
         userRepository.deleteById(userId);
@@ -78,7 +76,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getUser(Long userId) {
         return userMapper.toUserResponse(
-                userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
+                userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not existed")));
     }
 
 }

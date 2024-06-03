@@ -1,10 +1,12 @@
 package org.example.socialmediaspring.service.impl;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.example.socialmediaspring.config.JWTUtils;
 import org.example.socialmediaspring.dto.ReqRes;
 import org.example.socialmediaspring.entity.UserEntity;
-import org.example.socialmediaspring.exception.AppException;
-import org.example.socialmediaspring.exception.ErrorCode;
+import org.example.socialmediaspring.exception.ExceptionResponse;
+import org.example.socialmediaspring.exception.BusinessErrorCodes;
 import org.example.socialmediaspring.repository.UserRepository;
 import org.example.socialmediaspring.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.Random;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -32,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
         ReqRes resp = new ReqRes();
         try {
             if (userRepository.existsByEmail(registrationRequest.getEmail())) {
-                throw new AppException(ErrorCode.USER_EXISTED);
+                throw new EntityExistsException("User existed");
             }
 
             UserEntity user = new UserEntity();

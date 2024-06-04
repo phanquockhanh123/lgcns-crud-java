@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.Random;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,7 +18,7 @@ import java.util.Random;
 @Setter
 @Table(name = "users")
 @Builder
-public class UserEntity implements UserDetails {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

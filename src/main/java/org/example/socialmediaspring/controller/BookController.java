@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.dto.BookRequest;
 import org.example.socialmediaspring.dto.BookResponse;
-import org.example.socialmediaspring.entity.BookEntity;
+import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.service.BookService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +17,7 @@ public class BookController {
     private final BookService bookService;
 
     @PostMapping
-    public ResponseEntity<BookEntity> saveBook(
+    public ResponseEntity<Book> saveBook(
             @Valid @RequestBody BookRequest request
     ) {
         return ResponseEntity.ok(bookService.saveBook(request));

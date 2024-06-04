@@ -5,9 +5,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.example.socialmediaspring.dto.CreateUserRequest;
 import org.example.socialmediaspring.dto.UpdateUserRequest;
 import org.example.socialmediaspring.dto.UserResponse;
-import org.example.socialmediaspring.entity.UserEntity;
-import org.example.socialmediaspring.exception.ExceptionResponse;
-import org.example.socialmediaspring.exception.BusinessErrorCodes;
+import org.example.socialmediaspring.entity.User;
 import org.example.socialmediaspring.mapper.UserMapper;
 import org.example.socialmediaspring.repository.UserRepository;
 import org.example.socialmediaspring.service.UserService;
@@ -29,7 +27,7 @@ public class UserServiceImpl implements UserService {
             throw new EntityExistsException("User existed");
         }
 
-        UserEntity user  = UserEntity.builder()
+        User user  = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .userName(request.getUserName())
@@ -38,7 +36,7 @@ public class UserServiceImpl implements UserService {
                 .userName(request.getEmail())
                 .build();
 
-        UserEntity saveUser = userRepository.save(user);
+        User saveUser = userRepository.save(user);
 
         UserResponse rs = userMapper.toUserResponse(saveUser);
 
@@ -57,7 +55,7 @@ public class UserServiceImpl implements UserService {
                     user.setAddress(request.getAddress());
                     user.setEmail(request.getEmail());
 
-                    UserEntity newUser = userRepository.save(user);
+                    User newUser = userRepository.save(user);
                     UserResponse rs = userMapper.toUserResponse(newUser);
                     return rs;
                 })

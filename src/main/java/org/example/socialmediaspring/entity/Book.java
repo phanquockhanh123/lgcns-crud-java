@@ -16,11 +16,12 @@ import org.example.socialmediaspring.common.BaseEntity;
 @SuperBuilder
 @Entity
 @Table(name = "books")
-public class BookEntity extends BaseEntity {
+public class Book extends BaseEntity {
+    private Integer categoryId;
     private String title;
-    private String authorName;
+    private String author;
     private String isbn;
-    private String synopsis;
-    private String bookCover;
+    private String description;
+    private Long price;
 
 }

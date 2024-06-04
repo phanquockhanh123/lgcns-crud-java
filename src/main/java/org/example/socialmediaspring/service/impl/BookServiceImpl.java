@@ -1,11 +1,12 @@
 package org.example.socialmediaspring.service.impl;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.dto.BookRequest;
 import org.example.socialmediaspring.dto.BookResponse;
-import org.example.socialmediaspring.entity.BookEntity;
+import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.mapper.BookMapper;
 import org.example.socialmediaspring.repository.BookRepository;
 import org.example.socialmediaspring.service.BookService;
@@ -27,9 +28,11 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
 
+    private  final EntityManager entityManager;
+
     @Override
-    public BookEntity saveBook(BookRequest bookRequest) {
-        BookEntity book = bookMapper.toBook(bookRequest);
+    public Book saveBook(BookRequest bookRequest) {
+        Book book = bookMapper.toBook(bookRequest);
 
         return bookRepository.save(book);
     }
@@ -38,7 +41,7 @@ public class BookServiceImpl implements BookService {
     public PageResponse<BookResponse> findAllBooks(int page, int size, String title, String author) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("created").descending());
 
-        Page<BookEntity> books = bookRepository.findBooksByConds(pageable, title, author);
+        Page<Book> books = bookRepository.findBooksByConds(pageable, title, author);
         List<BookResponse> booksResponse = books.stream()
                 .map(bookMapper::toBookResponse)
                 .toList();
@@ -52,6 +55,5 @@ public class BookServiceImpl implements BookService {
                 books.isLast()
         );
     }
-
 
 }

@@ -2,29 +2,33 @@ package org.example.socialmediaspring.mapper;
 
 import org.example.socialmediaspring.dto.BookRequest;
 import org.example.socialmediaspring.dto.BookResponse;
-import org.example.socialmediaspring.entity.BookEntity;
+import org.example.socialmediaspring.entity.Book;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 public class BookMapper {
-    public BookEntity toBook(BookRequest request) {
-        return BookEntity.builder()
+    public Book toBook(BookRequest request) {
+        return Book.builder()
+                .categoryId(request.getCategoryId())
                 .title(request.getTitle())
                 .isbn(request.getIsbn())
-                .authorName(request.getAuthorName())
-                .synopsis(request.getSynopsis())
-                .bookCover(request.getBookCover())
+                .author(request.getAuthor())
+                .description(request.getDescription())
+                .price(request.getPrice())
                 .build();
     }
 
-    public BookResponse toBookResponse(BookEntity book) {
+    public BookResponse toBookResponse(Book book) {
         return BookResponse.builder()
                 .id(book.getId())
+                .categoryId(book.getCategoryId())
                 .title(book.getTitle())
-                .authorName(book.getAuthorName())
+                .author(book.getAuthor())
                 .isbn(book.getIsbn())
-                .synopsis(book.getSynopsis())
-                .bookCover(book.getBookCover())
+                .description(book.getDescription())
+                .price(book.getPrice())
                 .build();
     }
 }

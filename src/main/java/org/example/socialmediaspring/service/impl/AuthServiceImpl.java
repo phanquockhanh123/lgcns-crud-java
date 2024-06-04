@@ -1,12 +1,9 @@
 package org.example.socialmediaspring.service.impl;
 
 import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
 import org.example.socialmediaspring.config.JWTUtils;
 import org.example.socialmediaspring.dto.ReqRes;
-import org.example.socialmediaspring.entity.UserEntity;
-import org.example.socialmediaspring.exception.ExceptionResponse;
-import org.example.socialmediaspring.exception.BusinessErrorCodes;
+import org.example.socialmediaspring.entity.User;
 import org.example.socialmediaspring.repository.UserRepository;
 import org.example.socialmediaspring.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
                 throw new EntityExistsException("User existed");
             }
 
-            UserEntity user = new UserEntity();
+            User user = new User();
             user.setEmail(registrationRequest.getEmail());
             user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
             user.setRole(registrationRequest.getRole());
@@ -44,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
             user.setLastName(registrationRequest.getLastName());
             user.setUserName(registrationRequest.getEmail());
             user.setAddress(registrationRequest.getAddress());
-            UserEntity userResult = userRepository.save(user);
+            User userResult = userRepository.save(user);
             if (userResult != null && userResult.getId()>0) {
                 resp.setUsers(userResult);
                 resp.setMessage("User Saved Successfully");
@@ -83,7 +80,7 @@ public class AuthServiceImpl implements AuthService {
     public ReqRes refreshToken(ReqRes refreshTokenRequest) {
         ReqRes response = new ReqRes();
         String ourEmail = jwtUtils.extractUsername(refreshTokenRequest.getToken());
-        UserEntity users = userRepository.findByEmail(ourEmail).orElseThrow();
+        User users = userRepository.findByEmail(ourEmail).orElseThrow();
         if (jwtUtils.isTokenValid(refreshTokenRequest.getToken(), users)) {
             var jwt = jwtUtils.generateToken(users);
             response.setStatusCode(200);

@@ -3,7 +3,7 @@ package org.example.socialmediaspring.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-import org.example.socialmediaspring.entity.UserEntity;
+import org.example.socialmediaspring.entity.User;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -22,5 +22,5 @@ public class ReqRes {
     private String role;
     private String password;
     private String address;
-    private UserEntity users;
+    private User users;
 }

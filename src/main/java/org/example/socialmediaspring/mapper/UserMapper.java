@@ -1,18 +1,17 @@
 package org.example.socialmediaspring.mapper;
 
-import org.example.socialmediaspring.dto.CreateUserRequest;
 import org.example.socialmediaspring.dto.UserResponse;
-import org.example.socialmediaspring.entity.UserEntity;
+import org.example.socialmediaspring.entity.User;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
-    public UserEntity toUserEntity(UserResponse userResponse) {
+    public User toUserEntity(UserResponse userResponse) {
         if (userResponse == null) {
             return null;
         }
 
-        UserEntity user = new UserEntity();
+        User user = new User();
         user.setId(userResponse.getId());
         user.setFirstName(userResponse.getFirstName());
         user.setLastName(userResponse.getLastName());
@@ -22,7 +21,7 @@ public class UserMapper {
         return user;
     }
 
-    public UserResponse toUserResponse(UserEntity user) {
+    public UserResponse toUserResponse(User user) {
         if (user == null) {
             return null;
         }

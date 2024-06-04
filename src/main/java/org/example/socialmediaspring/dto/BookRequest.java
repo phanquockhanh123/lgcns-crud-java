@@ -10,14 +10,16 @@ import org.hibernate.annotations.BatchSize;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookRequest{
-        @NotEmpty(message = "title not empty")
+
+        private Integer categoryId;
+
         private String title;
-        @NotEmpty(message = "author name not empty")
-        private String authorName;
-        @NotEmpty(message = "isbn not empty")
+
+        private String author;
+
         private String isbn;
-        @NotEmpty(message = "synopsis not empty")
-        private String synopsis;
-        @NotEmpty(message = "book cover not empty")
-        private String bookCover;
+
+        private String description;
+
+        private Long price;
 }

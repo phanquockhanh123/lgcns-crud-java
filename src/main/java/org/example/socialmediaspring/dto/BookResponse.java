@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -13,9 +16,10 @@ import lombok.Setter;
 @Builder
 public class BookResponse {
     private Integer id;
+    private Integer categoryId;
     private String title;
-    private String authorName;
+    private String author;
     private String isbn;
-    private String synopsis;
-    private String bookCover;
+    private String description;
+    private Long price;
 }

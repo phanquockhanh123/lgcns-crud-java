@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
                     UserResponse rs = userMapper.toUserResponse(newUser);
                     return rs;
                 })
-                .orElseThrow(() -> new EntityNotFoundException("User existed"));
+                .orElseThrow(() -> new EntityNotFoundException("User not existed"));
     }
 
     @Override

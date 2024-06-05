@@ -3,12 +3,16 @@ package org.example.socialmediaspring.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.socialmediaspring.common.PageResponse;
+import org.example.socialmediaspring.dto.ApiResponse;
 import org.example.socialmediaspring.dto.BookRequest;
 import org.example.socialmediaspring.dto.BookResponse;
 import org.example.socialmediaspring.entity.Book;
+import org.example.socialmediaspring.entity.Category;
 import org.example.socialmediaspring.service.BookService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/admin/books")
@@ -31,5 +35,25 @@ public class BookController {
             @RequestParam(name = "author", required = false) String author
     ) {
         return ResponseEntity.ok(bookService.findAllBooks(page, size, title, author));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<BookResponse> updateBook(
+            @PathVariable Integer id,
+            @RequestBody  BookRequest request) {
+        return ResponseEntity.ok(bookService.updateBook(id, request));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<BookResponse> getBook(@PathVariable Integer id) {
+        return ResponseEntity.ok(bookService.getBookById(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<String> deleteBook(@PathVariable Integer id) {
+        bookService.deleteBook(id);
+        return ApiResponse.<String>builder()
+                .result("Book has been deleted")
+                .build();
     }
 }

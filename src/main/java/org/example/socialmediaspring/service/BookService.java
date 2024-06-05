@@ -10,4 +10,10 @@ public interface BookService {
 
     PageResponse<BookResponse> findAllBooks(int page, int size, String title, String author);
 
+    BookResponse updateBook(Integer id, BookRequest request);
+
+    BookResponse getBookById(Integer id);
+
+    void deleteBook(Integer id);
+
 }

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.dto.ApiResponse;
+import org.example.socialmediaspring.dto.BookCategoryDto;
 import org.example.socialmediaspring.dto.BookRequest;
 import org.example.socialmediaspring.dto.BookResponse;
 import org.example.socialmediaspring.entity.Book;
@@ -55,5 +56,16 @@ public class BookController {
         return ApiResponse.<String>builder()
                 .result("Book has been deleted")
                 .build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<PageResponse<BookCategoryDto>> searchBooksByConds(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(name = "size", defaultValue = "20", required = false) int size,
+            @RequestParam(name = "title", required = false) String title,
+            @RequestParam(name = "author", required = false) String author,
+            @RequestParam(name = "categoryId", required = false) Integer categoryId
+    ) {
+        return ResponseEntity.ok(bookService.searchAllBooks(page, size, title, author, categoryId));
     }
 }

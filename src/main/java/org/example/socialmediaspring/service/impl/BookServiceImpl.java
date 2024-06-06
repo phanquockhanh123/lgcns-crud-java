@@ -5,6 +5,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.common.PageResponse;
+import org.example.socialmediaspring.dto.BookCategoryDto;
 import org.example.socialmediaspring.dto.BookRequest;
 import org.example.socialmediaspring.dto.BookResponse;
 import org.example.socialmediaspring.dto.UserResponse;
@@ -92,6 +93,25 @@ public class BookServiceImpl implements BookService {
         }
 
         bookRepository.deleteById(id);
+    }
+
+    @Override
+    public PageResponse<BookCategoryDto> searchAllBooks(int page, int size, String title, String author, Integer categoryId) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("created").descending());
+
+        Page<BookCategoryDto> books = bookRepository.searchBooksByConds(pageable, title, author, categoryId);
+
+        System.out.println("Result books: {}" + books);
+        List<BookCategoryDto> booksResponse = books.stream().toList();
+        return new PageResponse<>(
+                booksResponse,
+                books.getNumber(),
+                books.getSize(),
+                books.getTotalElements(),
+                books.getTotalPages(),
+                books.isFirst(),
+                books.isLast()
+        );
     }
 
 }

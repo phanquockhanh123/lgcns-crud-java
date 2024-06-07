@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.socialmediaspring.common.IsbnGenerator;
 import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.dto.BookCategoryDto;
 import org.example.socialmediaspring.dto.BookRequest;
@@ -35,9 +36,13 @@ public class BookServiceImpl implements BookService {
 
     private  final EntityManager entityManager;
 
+    private final IsbnGenerator isbnGenerator;
+
     @Override
     public Book saveBook(BookRequest bookRequest) {
         Book book = bookMapper.toBook(bookRequest);
+
+        book.setIsbn(isbnGenerator.generateISBN());
 
         return bookRepository.save(book);
     }
@@ -68,7 +73,6 @@ public class BookServiceImpl implements BookService {
                     book.setTitle(request.getTitle());
                     book.setCategoryId(request.getCategoryId());
                     book.setPrice(request.getPrice());
-                    book.setIsbn(request.getIsbn());
                     book.setDescription(request.getDescription());
                     book.setAuthor(request.getAuthor());
 

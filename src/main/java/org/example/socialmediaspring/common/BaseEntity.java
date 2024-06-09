@@ -1,5 +1,6 @@
 package org.example.socialmediaspring.common;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -24,17 +26,22 @@ public class BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @CreationTimestamp
-    private LocalDateTime created;
+    @Column(name = "created")
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    private Date created;
 
-    @UpdateTimestamp
-    private LocalDateTime modified;
+    @Column(name = "modified")
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    private Date modified;
 
-//    @CreatedBy
-//    @Column(nullable = false, updatable = false)
-//    private Integer createdBy;
-//
-//    @LastModifiedBy
-//    @Column(insertable = false)
-//    private Integer lastModifiedBy;
+    @PrePersist
+    private void onCreate() {
+        this.created = new Date();
+        this.modified = new Date();
+    }
+
+    @PreUpdate
+    private  void onUpdate() {
+        this.modified = new Date();
+    }
 }

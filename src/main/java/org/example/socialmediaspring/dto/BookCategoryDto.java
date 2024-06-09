@@ -17,5 +17,5 @@ public class BookCategoryDto {
     private String isbn;
     private Long price;
     private String categoryName;
-    private LocalDateTime created;
+    private Date created;
 }

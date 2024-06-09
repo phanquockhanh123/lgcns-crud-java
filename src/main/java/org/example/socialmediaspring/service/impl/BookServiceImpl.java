@@ -1,17 +1,16 @@
 package org.example.socialmediaspring.service.impl;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.common.IsbnGenerator;
 import org.example.socialmediaspring.common.PageResponse;
-import org.example.socialmediaspring.dto.BookCategoryDto;
-import org.example.socialmediaspring.dto.BookRequest;
-import org.example.socialmediaspring.dto.BookResponse;
-import org.example.socialmediaspring.dto.UserResponse;
+import org.example.socialmediaspring.constant.ErrorCodeConst;
+import org.example.socialmediaspring.dto.*;
 import org.example.socialmediaspring.entity.Book;
-import org.example.socialmediaspring.entity.Category;
+import org.example.socialmediaspring.exception.BizException;
 import org.example.socialmediaspring.mapper.BookMapper;
 import org.example.socialmediaspring.repository.BookRepository;
 import org.example.socialmediaspring.service.BookService;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +38,10 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book saveBook(BookRequest bookRequest) {
+        if (bookRepository.existsByTitle(bookRequest.getTitle())) {
+            throw new BizException(ErrorCodeConst.INVALID_INPUT, "Book name existed");
+        }
+
         Book book = bookMapper.toBook(bookRequest);
 
         book.setIsbn(isbnGenerator.generateISBN());
@@ -50,6 +52,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public PageResponse<BookResponse> findAllBooks(int page, int size, String title, String author) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("created").descending());
+
 
         Page<Book> books = bookRepository.findBooksByConds(pageable, title, author);
         List<BookResponse> booksResponse = books.stream()
@@ -100,10 +103,11 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public PageResponse<BookCategoryDto> searchAllBooks(int page, int size, String title, String author, Integer categoryId) {
+    public PageResponse<BookCategoryDto> searchAllBooks(int page, int size, String title, String author, List<Integer> cateIds) {
+
         Pageable pageable = PageRequest.of(page, size, Sort.by("created").descending());
 
-        Page<BookCategoryDto> books = bookRepository.searchBooksByConds(pageable, title, author, categoryId);
+        Page<BookCategoryDto> books = bookRepository.searchBooksByConds(pageable, title, author, cateIds);
 
         System.out.println("Result books: {}" + books);
         List<BookCategoryDto> booksResponse = books.stream().toList();
@@ -116,6 +120,11 @@ public class BookServiceImpl implements BookService {
                 books.isFirst(),
                 books.isLast()
         );
+    }
+
+    @Override
+    public void deleteBooksByIds(BookIdsDto ids) {
+        bookRepository.deleteAllById(ids.getIds());
     }
 
 }

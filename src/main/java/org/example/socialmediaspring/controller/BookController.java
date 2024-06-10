@@ -70,7 +70,7 @@ public class BookController {
 
     @DeleteMapping
     public ResponseEntity deleteBooksByIds(@RequestBody BookIdsDto ids) {
-        bookService.deleteBooksByIds(ids);
-        return responseFactory.success(null);
+
+        return responseFactory.success(bookService.deleteBooksByIds(ids));
     }
 }

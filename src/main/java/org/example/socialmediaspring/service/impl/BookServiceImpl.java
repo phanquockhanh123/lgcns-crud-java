@@ -14,12 +14,14 @@ import org.example.socialmediaspring.exception.BizException;
 import org.example.socialmediaspring.mapper.BookMapper;
 import org.example.socialmediaspring.repository.BookRepository;
 import org.example.socialmediaspring.service.BookService;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.ModelMap;
 
 import java.util.List;
 
@@ -39,7 +41,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public Book saveBook(BookRequest bookRequest) {
         if (bookRepository.existsByTitle(bookRequest.getTitle())) {
-            throw new BizException(ErrorCodeConst.INVALID_INPUT, "Book name existed");
+            throw new BizException(ErrorCodeConst.INVALID_INPUT, "Book title existed");
         }
 
         Book book = bookMapper.toBook(bookRequest);
@@ -71,25 +73,32 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookResponse updateBook(Integer id, BookRequest request) {
-        return bookRepository.findById(id)
-                .map(book -> {
-                    book.setTitle(request.getTitle());
-                    book.setCategoryId(request.getCategoryId());
-                    book.setPrice(request.getPrice());
-                    book.setDescription(request.getDescription());
-                    book.setAuthor(request.getAuthor());
+        Book existsBook = bookRepository.findById(id)
+                .orElseThrow(() -> new BizException(ErrorCodeConst.INVALID_INPUT, "Book not found with id " + id));
 
-                    Book newBook = bookRepository.save(book);
-                    BookResponse rs = bookMapper.toBookResponse(newBook);
-                    return rs;
-                })
-                .orElseThrow(() -> new EntityNotFoundException("Book not existed"));
+        // check another title same exists
+        bookRepository.findBookByTitle(request.getTitle()).ifPresent(book -> {
+            if (!book.getId().equals(id)) {
+                throw new BizException(ErrorCodeConst.INVALID_INPUT,"Book with title " + request.getTitle() + " already exists");
+            }
+        });
+
+       existsBook.setTitle(request.getTitle());
+       existsBook.setAuthor(request.getAuthor());
+       existsBook.setPrice(request.getPrice());
+       existsBook.setDescription(request.getDescription());
+       existsBook.setCategoryId(request.getCategoryId());
+
+       Book rs =  bookRepository.save(existsBook);
+       BookResponse rsResponse = bookMapper.toBookResponse(rs);
+
+       return rsResponse;
     }
 
     @Override
     public BookResponse getBookById(Integer id) {
         return bookMapper.toBookResponse(
-                bookRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Book not existed")));
+                bookRepository.findById(id).orElseThrow(() -> new BizException(ErrorCodeConst.INVALID_INPUT, "Book not existed")));
     }
 
     @Override
@@ -123,8 +132,15 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void deleteBooksByIds(BookIdsDto ids) {
+    @Transactional
+    public String deleteBooksByIds(BookIdsDto ids) {
         bookRepository.deleteAllById(ids.getIds());
+
+        StringBuilder message = new StringBuilder();
+        message.append("Delete books ids success");
+
+        return message.toString();
+
     }
 
 }

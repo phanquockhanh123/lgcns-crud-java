@@ -9,11 +9,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book, Integer> {
     Page<Book> findAll(Pageable pageable);
 
     Boolean existsByTitle(String title);
+
+    Optional<Book> findBookByTitle(String title);
 
     @Query(value = "SELECT * FROM books b " +
             " WHERE (:title is null OR b.title LIKE :title) " +

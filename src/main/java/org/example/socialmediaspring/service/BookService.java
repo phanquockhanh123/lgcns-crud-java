@@ -22,5 +22,5 @@ public interface BookService {
 
     PageResponse<BookCategoryDto> searchAllBooks(int page, int size, String title, String author, List<Integer> cateIds);
 
-    void deleteBooksByIds(BookIdsDto id);
+    String deleteBooksByIds(BookIdsDto id);
 }

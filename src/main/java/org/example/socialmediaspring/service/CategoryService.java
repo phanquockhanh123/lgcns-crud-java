@@ -17,5 +17,5 @@ public interface CategoryService {
 
     PageResponse<Category> getAllCategories(int page, int size);
 
-    Optional<Category> getCategoryById(Integer id);
+    Category getCategoryById(Integer id);
 }

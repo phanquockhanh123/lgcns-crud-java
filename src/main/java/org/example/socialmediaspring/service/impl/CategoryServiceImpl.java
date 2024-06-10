@@ -8,6 +8,7 @@ import org.example.socialmediaspring.dto.CategoryRequest;
 import org.example.socialmediaspring.entity.Category;
 import org.example.socialmediaspring.repository.CategoryRepository;
 import org.example.socialmediaspring.service.CategoryService;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private  final CategoryRepository categoryRepository;
+
+    private final ModelMapper mapper;
+
 
     @Override
     public Category createCategory(CategoryRequest category) {
@@ -75,12 +79,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Optional<Category> getCategoryById(Integer id) {
+    public Category getCategoryById(Integer id) {
         if (!categoryRepository.existsById(id)) {
             throw new EntityNotFoundException("User not existed");
         }
+        Category category = categoryRepository.findBookById(id);
 
-        Optional<Category> category = categoryRepository.findById(id);
         return category;
     }
 }

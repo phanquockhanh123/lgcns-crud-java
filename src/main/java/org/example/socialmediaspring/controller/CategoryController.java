@@ -1,6 +1,7 @@
 package org.example.socialmediaspring.controller;
 
 import org.example.socialmediaspring.common.PageResponse;
+import org.example.socialmediaspring.common.ResponseFactory;
 import org.example.socialmediaspring.dto.ApiResponse;
 import org.example.socialmediaspring.dto.BookResponse;
 import org.example.socialmediaspring.dto.CategoryRequest;
@@ -20,41 +21,38 @@ public class CategoryController {
     @Autowired
     CategoryService categoryService;
 
+    @Autowired
+    ResponseFactory responseFactory;
+
     @PostMapping
-    public ApiResponse<Category> createCategory(@RequestBody CategoryRequest categoryRequest) {
-        return ApiResponse.<Category>builder()
-                .result(categoryService.createCategory(categoryRequest))
-                .build();
+    public ResponseEntity createCategory(@RequestBody CategoryRequest categoryRequest) {
+        return responseFactory.success(categoryService.createCategory(categoryRequest));
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<Category> updateCategory(
+    public ResponseEntity updateCategory(
             @PathVariable Integer id,
             @RequestBody CategoryRequest categoryRequest) {
-        return ApiResponse.<Category>builder()
-                .result(categoryService.updateCategory(id, categoryRequest))
-                .build();
+        return responseFactory.success(categoryService.updateCategory(id, categoryRequest));
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<String> deleteCategory(@PathVariable Integer id) {
+    public ResponseEntity deleteCategory(@PathVariable Integer id) {
         categoryService.deleteCategory(id);
-        return ApiResponse.<String>builder()
-                .result("Category has been deleted")
-                .build();
+        return responseFactory.success(null);
     }
 
     @GetMapping
-    public ResponseEntity<PageResponse<Category>> findAllCategories(
+    public ResponseEntity findAllCategories(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "size", defaultValue = "20", required = false) int size
     ) {
-        return ResponseEntity.ok(categoryService.getAllCategories(page, size));
+        return responseFactory.success(categoryService.getAllCategories(page, size));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Category>> getCategory(@PathVariable Integer id) {
-        return ResponseEntity.ok(categoryService.getCategoryById(id));
+    public ResponseEntity getCategory(@PathVariable Integer id) {
+        return responseFactory.success(categoryService.getCategoryById(id));
     }
 
 }

@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book saveBook(BookRequest bookRequest) {
+
         if (bookRepository.existsByTitle(bookRequest.getTitle())) {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "Book title existed");
         }

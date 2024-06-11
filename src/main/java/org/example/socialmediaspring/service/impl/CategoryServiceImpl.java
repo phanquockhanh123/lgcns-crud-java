@@ -4,8 +4,10 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.common.PageResponse;
+import org.example.socialmediaspring.constant.ErrorCodeConst;
 import org.example.socialmediaspring.dto.CategoryRequest;
 import org.example.socialmediaspring.entity.Category;
+import org.example.socialmediaspring.exception.BizException;
 import org.example.socialmediaspring.repository.CategoryRepository;
 import org.example.socialmediaspring.service.CategoryService;
 import org.modelmapper.ModelMapper;
@@ -28,10 +30,14 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public Category createCategory(CategoryRequest category) {
+    public Category createCategory(CategoryRequest request) {
+        if (categoryRepository.existsByName(request.getName())) {
+            throw new BizException(ErrorCodeConst.INVALID_INPUT, "Category name existed");
+        }
+
         Category newCat = new Category();
-        newCat.setName(category.getName());
-        newCat.setDescription(category.getDescription());
+        newCat.setName(request.getName());
+        newCat.setDescription(request.getDescription());
 
         return categoryRepository.save(newCat);
     }

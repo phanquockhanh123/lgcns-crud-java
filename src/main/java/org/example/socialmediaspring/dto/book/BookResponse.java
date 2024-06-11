@@ -1,13 +1,10 @@
-package org.example.socialmediaspring.dto;
+package org.example.socialmediaspring.dto.book;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -22,4 +19,7 @@ public class BookResponse {
     private String isbn;
     private String description;
     private Long price;
+    private Integer yearOfPublish;
+    private Integer quantity;
+    private Integer quantityAvail;
 }

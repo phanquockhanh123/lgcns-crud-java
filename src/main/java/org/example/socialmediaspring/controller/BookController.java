@@ -2,17 +2,14 @@ package org.example.socialmediaspring.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.common.ResponseFactory;
-import org.example.socialmediaspring.dto.*;
-import org.example.socialmediaspring.entity.Book;
-import org.example.socialmediaspring.entity.Category;
+import org.example.socialmediaspring.dto.book.BookIdsDto;
+import org.example.socialmediaspring.dto.book.BookRequest;
 import org.example.socialmediaspring.service.BookService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/admin/books")
@@ -63,9 +60,11 @@ public class BookController {
             @RequestParam(name = "size", defaultValue = "20", required = false) int size,
             @RequestParam(name = "title", required = false) String title,
             @RequestParam(name = "author", required = false) String author,
-            @RequestParam(name = "cateIds", required = false) List<Integer> cateIds
+            @RequestParam(name = "cateIds", required = false) List<Integer> cateIds,
+            @RequestParam(name = "yearFrom", required = false) Integer yearFrom,
+            @RequestParam(name = "yearTo", required = false) Integer yearTo
     ) {
-        return responseFactory.success(bookService.searchAllBooks(page, size, title, author, cateIds));
+        return responseFactory.success(bookService.searchAllBooks(page, size, title, author, cateIds, yearFrom, yearTo));
     }
 
     @DeleteMapping

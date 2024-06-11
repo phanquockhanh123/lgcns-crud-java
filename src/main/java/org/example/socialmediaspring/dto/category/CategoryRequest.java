@@ -1,6 +1,5 @@
-package org.example.socialmediaspring.dto;
+package org.example.socialmediaspring.dto.category;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

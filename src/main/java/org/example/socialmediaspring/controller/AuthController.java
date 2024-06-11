@@ -1,6 +1,6 @@
 package org.example.socialmediaspring.controller;
 
-import org.example.socialmediaspring.dto.ReqRes;
+import org.example.socialmediaspring.dto.common.ReqRes;
 import org.example.socialmediaspring.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

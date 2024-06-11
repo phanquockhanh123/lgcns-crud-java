@@ -2,7 +2,7 @@ package org.example.socialmediaspring.service.impl;
 
 import jakarta.persistence.EntityExistsException;
 import org.example.socialmediaspring.config.JWTUtils;
-import org.example.socialmediaspring.dto.ReqRes;
+import org.example.socialmediaspring.dto.common.ReqRes;
 import org.example.socialmediaspring.entity.User;
 import org.example.socialmediaspring.repository.UserRepository;
 import org.example.socialmediaspring.service.AuthService;
@@ -36,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
             User user = new User();
             user.setEmail(registrationRequest.getEmail());
             user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
-            user.setRole(registrationRequest.getRole());
+            user.setRole("USER");
             user.setFirstName(registrationRequest.getFirstName());
             user.setLastName(registrationRequest.getLastName());
             user.setUserName(registrationRequest.getEmail());

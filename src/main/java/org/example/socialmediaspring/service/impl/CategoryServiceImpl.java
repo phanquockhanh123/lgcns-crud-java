@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.constant.ErrorCodeConst;
-import org.example.socialmediaspring.dto.CategoryRequest;
+import org.example.socialmediaspring.dto.category.CategoryRequest;
 import org.example.socialmediaspring.entity.Category;
 import org.example.socialmediaspring.exception.BizException;
 import org.example.socialmediaspring.repository.CategoryRepository;
@@ -18,7 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j

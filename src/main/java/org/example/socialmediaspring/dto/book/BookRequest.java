@@ -1,14 +1,10 @@
-package org.example.socialmediaspring.dto;
+package org.example.socialmediaspring.dto.book;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Type;
 
 @Data
 @AllArgsConstructor
@@ -30,4 +26,13 @@ public class BookRequest{
 
         @NotNull(message = "Price is required")
         private Long price;
+
+        @NotNull(message = "Year of publish is required")
+        private Integer year;
+
+        @NotNull(message = "Quantity is required")
+        private Integer quantity;
+
+        private Integer quantityAvail;
+
 }

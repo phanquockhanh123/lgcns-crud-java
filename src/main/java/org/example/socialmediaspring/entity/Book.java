@@ -20,4 +20,8 @@ public class Book extends BaseEntity {
     private String isbn;
     private String description;
     private Long price;
+    private Integer yearOfPublish;
+    private Integer quantity = 0;
+    private Integer quantityAvail = 0;
+
 }

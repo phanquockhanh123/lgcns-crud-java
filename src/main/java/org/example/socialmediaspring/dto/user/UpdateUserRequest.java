@@ -1,4 +1,4 @@
-package org.example.socialmediaspring.dto;
+package org.example.socialmediaspring.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,4 +14,6 @@ public class UpdateUserRequest {
     private String password;
     private String address;
     private String email;
+    private String phone;
+    private String role;
 }

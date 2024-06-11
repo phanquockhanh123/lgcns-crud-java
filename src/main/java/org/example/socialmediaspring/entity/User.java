@@ -29,6 +29,7 @@ public class User implements UserDetails {
     private String address;
     private String password;
     private String role;
+    private String phone;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

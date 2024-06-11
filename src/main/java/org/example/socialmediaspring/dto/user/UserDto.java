@@ -1,4 +1,4 @@
-package org.example.socialmediaspring.dto;
+package org.example.socialmediaspring.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

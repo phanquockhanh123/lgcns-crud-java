@@ -1,6 +1,6 @@
 package org.example.socialmediaspring.mapper;
 
-import org.example.socialmediaspring.dto.UserResponse;
+import org.example.socialmediaspring.dto.user.UserResponse;
 import org.example.socialmediaspring.entity.User;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +18,7 @@ public class UserMapper {
         user.setUserName(userResponse.getUserName());
         user.setAddress(userResponse.getAddress());
         user.setEmail(userResponse.getEmail());
+        user.setPhone(userResponse.getPhone());
         return user;
     }
 
@@ -33,6 +34,8 @@ public class UserMapper {
         userRes.setUserName(user.getUsername());
         userRes.setAddress(user.getAddress());
         userRes.setEmail(user.getEmail());
+        userRes.setPhone(user.getPhone());
+        userRes.setRole(user.getRole());
 
         return userRes;
     }

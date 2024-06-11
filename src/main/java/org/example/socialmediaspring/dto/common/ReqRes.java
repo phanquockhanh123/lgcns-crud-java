@@ -1,4 +1,4 @@
-package org.example.socialmediaspring.dto;
+package org.example.socialmediaspring.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -19,7 +19,6 @@ public class ReqRes {
     private String firstName;
     private String lastName;
     private String email;
-    private String role;
     private String password;
     private String address;
     private User users;

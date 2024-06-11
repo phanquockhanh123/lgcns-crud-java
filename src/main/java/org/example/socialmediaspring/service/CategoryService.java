@@ -1,12 +1,8 @@
 package org.example.socialmediaspring.service;
 
 import org.example.socialmediaspring.common.PageResponse;
-import org.example.socialmediaspring.dto.ApiResponse;
-import org.example.socialmediaspring.dto.CategoryRequest;
+import org.example.socialmediaspring.dto.category.CategoryRequest;
 import org.example.socialmediaspring.entity.Category;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface CategoryService {
     Category createCategory(CategoryRequest category);

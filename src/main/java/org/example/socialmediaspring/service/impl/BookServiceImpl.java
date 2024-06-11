@@ -1,6 +1,5 @@
 package org.example.socialmediaspring.service.impl;
 
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -8,21 +7,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.common.IsbnGenerator;
 import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.constant.ErrorCodeConst;
-import org.example.socialmediaspring.dto.*;
+import org.example.socialmediaspring.dto.book.BookCategoryDto;
+import org.example.socialmediaspring.dto.book.BookIdsDto;
+import org.example.socialmediaspring.dto.book.BookRequest;
+import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.exception.BizException;
 import org.example.socialmediaspring.mapper.BookMapper;
 import org.example.socialmediaspring.repository.BookRepository;
 import org.example.socialmediaspring.service.BookService;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
 
 import java.util.List;
 
@@ -49,6 +48,7 @@ public class BookServiceImpl implements BookService {
         Book book = bookMapper.toBook(bookRequest);
 
         book.setIsbn(isbnGenerator.generateISBN());
+        book.setQuantityAvail(book.getQuantity());
 
         return bookRepository.save(book);
     }
@@ -86,15 +86,17 @@ public class BookServiceImpl implements BookService {
         });
 
        existsBook.setTitle(request.getTitle());
-       existsBook.setAuthor(request.getAuthor());
-       existsBook.setPrice(request.getPrice());
-       existsBook.setDescription(request.getDescription());
-       existsBook.setCategoryId(request.getCategoryId());
+        existsBook.setAuthor(request.getAuthor());
+        existsBook.setPrice(request.getPrice());
+        existsBook.setDescription(request.getDescription());
+        existsBook.setCategoryId(request.getCategoryId());
+        existsBook.setQuantity(request.getQuantity());
+        existsBook.setYearOfPublish(request.getYear());
 
-       Book rs =  bookRepository.save(existsBook);
-       BookResponse rsResponse = bookMapper.toBookResponse(rs);
+        Book rs =  bookRepository.save(existsBook);
+        BookResponse rsResponse = bookMapper.toBookResponse(rs);
 
-       return rsResponse;
+        return rsResponse;
     }
 
     @Override
@@ -114,11 +116,11 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public PageResponse<BookCategoryDto> searchAllBooks(int page, int size, String title, String author, List<Integer> cateIds) {
+    public PageResponse<BookCategoryDto> searchAllBooks(int page, int size, String title, String author, List<Integer> cateIds, Integer yearFrom, Integer yearTo) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("created").descending());
 
-        Page<BookCategoryDto> books = bookRepository.searchBooksByConds(pageable, title, author, cateIds);
+        Page<BookCategoryDto> books = bookRepository.searchBooksByConds(pageable, title, author, cateIds, yearFrom, yearTo);
 
         System.out.println("Result books: {}" + books);
         List<BookCategoryDto> booksResponse = books.stream().toList();

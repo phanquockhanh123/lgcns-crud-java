@@ -1,7 +1,6 @@
-package org.example.socialmediaspring.dto;
+package org.example.socialmediaspring.dto.user;
 
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 
 @Data
 @NoArgsConstructor
@@ -16,4 +15,6 @@ public class UserResponse {
     String userName;
     String address;
     String email;
+    String phone;
+    String role;
 }

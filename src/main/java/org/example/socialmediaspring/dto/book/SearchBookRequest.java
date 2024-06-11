@@ -1,4 +1,4 @@
-package org.example.socialmediaspring.dto;
+package org.example.socialmediaspring.dto.book;
 
 import lombok.*;
 

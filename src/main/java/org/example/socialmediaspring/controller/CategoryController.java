@@ -1,19 +1,11 @@
 package org.example.socialmediaspring.controller;
 
-import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.common.ResponseFactory;
-import org.example.socialmediaspring.dto.ApiResponse;
-import org.example.socialmediaspring.dto.BookResponse;
-import org.example.socialmediaspring.dto.CategoryRequest;
-import org.example.socialmediaspring.dto.UserResponse;
-import org.example.socialmediaspring.entity.Category;
+import org.example.socialmediaspring.dto.category.CategoryRequest;
 import org.example.socialmediaspring.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.swing.text.html.Option;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/admin/categories")

@@ -1,8 +1,9 @@
 package org.example.socialmediaspring.service;
 
-import org.example.socialmediaspring.dto.CreateUserRequest;
-import org.example.socialmediaspring.dto.UpdateUserRequest;
-import org.example.socialmediaspring.dto.UserResponse;
+import org.example.socialmediaspring.dto.user.CreateUserRequest;
+import org.example.socialmediaspring.dto.user.UpdateUserRequest;
+import org.example.socialmediaspring.dto.user.UserResponse;
+import org.example.socialmediaspring.entity.User;
 
 public interface UserService {
     UserResponse createUser(CreateUserRequest request);
@@ -11,6 +12,6 @@ public interface UserService {
 
     void deleteUser(Long userId);
 
-    UserResponse getUser(Long userId);
+    User getUser(Long userId);
 
 }

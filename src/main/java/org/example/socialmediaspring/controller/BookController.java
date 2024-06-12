@@ -3,7 +3,7 @@ package org.example.socialmediaspring.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.socialmediaspring.common.ResponseFactory;
-import org.example.socialmediaspring.dto.book.BookIdsDto;
+import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.book.BookRequest;
 import org.example.socialmediaspring.service.BookService;
 import org.springframework.http.ResponseEntity;
@@ -68,7 +68,7 @@ public class BookController {
     }
 
     @DeleteMapping
-    public ResponseEntity deleteBooksByIds(@RequestBody BookIdsDto ids) {
+    public ResponseEntity deleteBooksByIds(@RequestBody IdsRequest ids) {
 
         return responseFactory.success(bookService.deleteBooksByIds(ids));
     }

@@ -8,7 +8,7 @@ import org.example.socialmediaspring.common.IsbnGenerator;
 import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.constant.ErrorCodeConst;
 import org.example.socialmediaspring.dto.book.BookCategoryDto;
-import org.example.socialmediaspring.dto.book.BookIdsDto;
+import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.book.BookRequest;
 import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.entity.Book;
@@ -137,7 +137,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public String deleteBooksByIds(BookIdsDto ids) {
+    public String deleteBooksByIds(IdsRequest ids) {
         bookRepository.deleteAllById(ids.getIds());
 
         StringBuilder message = new StringBuilder();

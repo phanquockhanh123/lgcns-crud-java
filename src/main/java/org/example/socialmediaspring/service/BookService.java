@@ -2,7 +2,7 @@ package org.example.socialmediaspring.service;
 
 import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.dto.book.BookCategoryDto;
-import org.example.socialmediaspring.dto.book.BookIdsDto;
+import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.book.BookRequest;
 import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.entity.Book;
@@ -22,5 +22,5 @@ public interface BookService {
 
     PageResponse<BookCategoryDto> searchAllBooks(int page, int size, String title, String author, List<Integer> cateIds, Integer yearFrom, Integer yearTo);
 
-    String deleteBooksByIds(BookIdsDto id);
+    String deleteBooksByIds(IdsRequest id);
 }

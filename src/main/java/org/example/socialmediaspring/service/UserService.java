@@ -1,17 +1,23 @@
 package org.example.socialmediaspring.service;
 
-import org.example.socialmediaspring.dto.user.CreateUserRequest;
-import org.example.socialmediaspring.dto.user.UpdateUserRequest;
+import org.example.socialmediaspring.common.PageResponse;
+import org.example.socialmediaspring.dto.book.BookCategoryDto;
+import org.example.socialmediaspring.dto.common.IdsRequest;
+import org.example.socialmediaspring.dto.common.LongIdsRequest;
+import org.example.socialmediaspring.dto.user.UserRequest;
 import org.example.socialmediaspring.dto.user.UserResponse;
 import org.example.socialmediaspring.entity.User;
 
+import java.util.List;
+
 public interface UserService {
-    UserResponse createUser(CreateUserRequest request);
+    UserResponse createUser(UserRequest request);
 
-    UserResponse updateUser(UpdateUserRequest request, Long userId);
+    UserResponse updateUser(UserRequest request, Long userId);
 
-    void deleteUser(Long userId);
+    String deleteUsersByIds(LongIdsRequest ids);
 
     User getUser(Long userId);
 
+    PageResponse<UserResponse> findUsers(int page, int size);
 }

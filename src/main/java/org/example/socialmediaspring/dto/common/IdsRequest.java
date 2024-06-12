@@ -1,4 +1,4 @@
-package org.example.socialmediaspring.dto.book;
+package org.example.socialmediaspring.dto.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +11,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookIdsDto {
+public class IdsRequest {
     private List<Integer> ids;
 }

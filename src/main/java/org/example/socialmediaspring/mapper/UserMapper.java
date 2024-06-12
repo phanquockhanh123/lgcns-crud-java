@@ -35,7 +35,7 @@ public class UserMapper {
         userRes.setAddress(user.getAddress());
         userRes.setEmail(user.getEmail());
         userRes.setPhone(user.getPhone());
-        userRes.setRole(user.getRole().name());
+        userRes.setRole(user.getRole());
 
         return userRes;
     }

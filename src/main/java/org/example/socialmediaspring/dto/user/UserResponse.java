@@ -1,6 +1,7 @@
 package org.example.socialmediaspring.dto.user;
 
 import lombok.*;
+import org.example.socialmediaspring.entity.Role;
 
 @Data
 @NoArgsConstructor
@@ -16,5 +17,5 @@ public class UserResponse {
     String address;
     String email;
     String phone;
-    String role;
+    Role role;
 }

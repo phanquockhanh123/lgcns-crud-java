@@ -22,7 +22,7 @@ public class BookController {
     private final ResponseFactory responseFactory;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('admin:create')")
+    @PreAuthorize("hasAnyAuthority('admin:create', 'manager:create')")
     public ResponseEntity saveBook(
             @Valid @RequestBody BookRequest request
     ) {
@@ -41,7 +41,7 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('admin:update')")
+    @PreAuthorize("hasAnyAuthority('admin:update', 'manager:update')")
     public ResponseEntity updateBook(
             @PathVariable Integer id,
             @Valid @RequestBody  BookRequest request) {
@@ -49,7 +49,7 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('admin:read')")
+    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read', 'user:read')")
     public ResponseEntity getBook(@PathVariable Integer id) {
         return responseFactory.success(bookService.getBookById(id));
     }
@@ -76,7 +76,7 @@ public class BookController {
     }
 
     @DeleteMapping
-    @PreAuthorize("hasAuthority('admin:delete')")
+    @PreAuthorize("hasAnyAuthority('admin:delete', 'manager:delete')")
     public ResponseEntity deleteBooksByIds(@RequestBody IdsRequest ids) {
 
         return responseFactory.success(bookService.deleteBooksByIds(ids));

@@ -7,6 +7,7 @@ import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.common.LongIdsRequest;
 import org.example.socialmediaspring.dto.user.UserRequest;
 import org.example.socialmediaspring.dto.user.UserResponse;
+import org.example.socialmediaspring.entity.Role;
 import org.example.socialmediaspring.entity.User;
 import org.example.socialmediaspring.exception.BizException;
 import org.example.socialmediaspring.mapper.UserMapper;
@@ -49,7 +50,7 @@ public class UserServiceImpl implements UserService {
                 .userName(request.getEmail())
                 .phone(request.getPhone())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role("USER")
+                .role(Role.USER)
                 .build();
 
         User saveUser = userRepository.save(user);

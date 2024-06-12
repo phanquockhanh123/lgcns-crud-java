@@ -7,6 +7,7 @@ import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.book.BookRequest;
 import org.example.socialmediaspring.service.BookService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,12 +15,14 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/admin/books")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
 public class BookController {
     private final BookService bookService;
 
     private final ResponseFactory responseFactory;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('admin:create')")
     public ResponseEntity saveBook(
             @Valid @RequestBody BookRequest request
     ) {
@@ -27,6 +30,7 @@ public class BookController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read', 'user:read')")
     public ResponseEntity findAllBooks(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "size", defaultValue = "20", required = false) int size,
@@ -37,6 +41,7 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('admin:update')")
     public ResponseEntity updateBook(
             @PathVariable Integer id,
             @Valid @RequestBody  BookRequest request) {
@@ -44,17 +49,20 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('admin:read')")
     public ResponseEntity getBook(@PathVariable Integer id) {
         return responseFactory.success(bookService.getBookById(id));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('admin:delete')")
     public  ResponseEntity deleteBook(@PathVariable Integer id) {
         bookService.deleteBook(id);
         return responseFactory.success(null);
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read', 'user:read')")
     public ResponseEntity searchBooksByConds(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "size", defaultValue = "20", required = false) int size,
@@ -68,6 +76,7 @@ public class BookController {
     }
 
     @DeleteMapping
+    @PreAuthorize("hasAuthority('admin:delete')")
     public ResponseEntity deleteBooksByIds(@RequestBody IdsRequest ids) {
 
         return responseFactory.success(bookService.deleteBooksByIds(ids));

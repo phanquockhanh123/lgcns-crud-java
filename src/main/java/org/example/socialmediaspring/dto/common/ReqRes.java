@@ -2,6 +2,7 @@ package org.example.socialmediaspring.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 import org.example.socialmediaspring.entity.User;
 
@@ -21,5 +22,6 @@ public class ReqRes {
     private String email;
     private String password;
     private String address;
+    private String phone;
     private User users;
 }

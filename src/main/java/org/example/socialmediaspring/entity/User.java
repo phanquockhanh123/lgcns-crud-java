@@ -28,12 +28,14 @@ public class User implements UserDetails {
     private String email;
     private String address;
     private String password;
-    private String role;
     private String phone;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return role.getAuthorities();
     }
 
     @Override

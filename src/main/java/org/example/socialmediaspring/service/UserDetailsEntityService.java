@@ -25,11 +25,11 @@ public class UserDetailsEntityService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                getAuthorities(user)
+                user.getRole().getAuthorities()
         );
     }
 
-    private Collection<? extends GrantedAuthority> getAuthorities(User user) {
-        return List.of(new SimpleGrantedAuthority(user.getRole()));
-    }
+//    private Collection<? extends GrantedAuthority> getAuthorities(User user) {
+//        return List.of(new SimpleGrantedAuthority(user.getRole().getAuthorities());
+//    }
 }

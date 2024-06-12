@@ -2,6 +2,7 @@ package org.example.socialmediaspring.controller;
 
 import org.example.socialmediaspring.dto.common.ReqRes;
 import org.example.socialmediaspring.service.AuthService;
+import org.example.socialmediaspring.service.LogoutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

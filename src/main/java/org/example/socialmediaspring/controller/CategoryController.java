@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/admin/categories")
-@PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
+@PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'USER')")
 public class CategoryController {
     @Autowired
     CategoryService categoryService;
@@ -40,7 +40,7 @@ public class CategoryController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read')")
+    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read', 'user:read')")
     public ResponseEntity findAllCategories(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "size", defaultValue = "20", required = false) int size

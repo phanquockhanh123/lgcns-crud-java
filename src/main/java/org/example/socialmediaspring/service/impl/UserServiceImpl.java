@@ -89,6 +89,7 @@ public class UserServiceImpl implements UserService {
         existsUser.setEmail(request.getEmail());
         existsUser.setPhone(request.getPhone());
         existsUser.setAddress(request.getAddress());
+        existsUser.setRole(Role.valueOf(request.getRole().toUpperCase()));
 
         User rs =  userRepository.save(existsUser);
         UserResponse rsResponse = userMapper.toUserResponse(rs);

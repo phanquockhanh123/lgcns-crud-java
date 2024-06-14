@@ -1,5 +1,6 @@
 package org.example.socialmediaspring.controller;
 
+import jakarta.validation.Valid;
 import org.example.socialmediaspring.common.ResponseFactory;
 import org.example.socialmediaspring.dto.category.CategoryRequest;
 import org.example.socialmediaspring.service.CategoryService;
@@ -20,7 +21,7 @@ public class CategoryController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('admin:create')")
-    public ResponseEntity createCategory(@RequestBody CategoryRequest categoryRequest) {
+    public ResponseEntity createCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
         return responseFactory.success(categoryService.createCategory(categoryRequest));
     }
 
@@ -28,7 +29,7 @@ public class CategoryController {
     @PreAuthorize("hasAuthority('admin:update')")
     public ResponseEntity updateCategory(
             @PathVariable Integer id,
-            @RequestBody CategoryRequest categoryRequest) {
+            @Valid @RequestBody CategoryRequest categoryRequest) {
         return responseFactory.success(categoryService.updateCategory(id, categoryRequest));
     }
 

@@ -2,6 +2,7 @@ package org.example.socialmediaspring.mapper;
 
 import org.example.socialmediaspring.dto.user.UserResponse;
 import org.example.socialmediaspring.entity.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -40,4 +41,11 @@ public class UserMapper {
         return userRes;
     }
 
+    public static User toUserEntity(UserDetails userDetails) {
+        User user = new User();
+        user.setUserName(userDetails.getUsername());
+        user.setPassword(userDetails.getPassword());
+        // Map other properties as needed
+        return user;
+    }
 }

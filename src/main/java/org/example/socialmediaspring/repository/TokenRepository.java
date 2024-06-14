@@ -1,7 +1,9 @@
 package org.example.socialmediaspring.repository;
 
 import org.example.socialmediaspring.entity.Token;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -17,4 +19,9 @@ public interface TokenRepository extends JpaRepository<Token, Integer> {
     List<Token> findAllValidTokenByUser(Integer id);
 
     Optional<Token> findByToken(String token);
+
+    @EntityGraph(attributePaths = {"user"})
+    @Modifying
+    @Query("DELETE FROM Token t WHERE t.user.id in (:userId)")
+    void deleteByUserId(List<Long> userId);
 }

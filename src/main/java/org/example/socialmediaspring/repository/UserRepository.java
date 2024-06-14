@@ -29,4 +29,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "SELECT new org.example.socialmediaspring.dto.user.UserResponse(u.id, u.firstName, u.lastName, u.userName, u.address, u.email,u.phone, u.role) FROM User u ")
     Page<UserResponse> findUsersByConds(Pageable pageable);
 
+    @Query(value = "SELECT * FROM users where user_name = :username ", nativeQuery = true)
+    User findUsersByUsername(String username);
+
 }

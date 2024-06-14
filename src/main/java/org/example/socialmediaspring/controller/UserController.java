@@ -1,9 +1,12 @@
 package org.example.socialmediaspring.controller;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.common.ResponseFactory;
+import org.example.socialmediaspring.dto.auth.ChangePasswordRequest;
 import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.common.LongIdsRequest;
+import org.example.socialmediaspring.dto.common.ReqRes;
 import org.example.socialmediaspring.dto.user.UserRequest;
 import org.example.socialmediaspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin/users")
 @Slf4j
-@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
 public class UserController {
     @Autowired
     UserService userService;
@@ -26,20 +30,20 @@ public class UserController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('admin:create', 'manager:create')")
-    public ResponseEntity createUser(@RequestBody UserRequest request) {
+    public ResponseEntity createUser(@Valid @RequestBody UserRequest request) {
 
         return responseFactory.success(userService.createUser(request));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('admin:update', 'manager:update')")
-    public ResponseEntity updateUser(@RequestBody UserRequest request, @PathVariable Long id) {
+    public ResponseEntity updateUser(@Valid @RequestBody UserRequest request, @PathVariable Long id) {
         return responseFactory.success(userService.updateUser(request, id));
     }
 
     @DeleteMapping
     @PreAuthorize("hasAnyAuthority('admin:delete', 'manager:delete')")
-    public ResponseEntity deleteUsersByIds(@RequestBody LongIdsRequest ids) {
+    public ResponseEntity deleteUsersByIds(@Valid @RequestBody LongIdsRequest ids) {
 
         return responseFactory.success( userService.deleteUsersByIds(ids));
 
@@ -58,6 +62,11 @@ public class UserController {
             @RequestParam(name = "size", defaultValue = "20", required = false) int size
     ) {
         return responseFactory.success(userService.findUsers(page, size));
+    }
+
+    @PostMapping("/change_password")
+    public ResponseEntity changePassword(@RequestBody ChangePasswordRequest request, Principal connectedUser){
+        return responseFactory.success(userService.changePassword(request, connectedUser));
     }
 
 }

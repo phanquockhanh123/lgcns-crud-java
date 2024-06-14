@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.constant.ErrorCodeConst;
 import org.example.socialmediaspring.dto.category.CategoryRequest;
+import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.entity.Category;
 import org.example.socialmediaspring.exception.BizException;
 import org.example.socialmediaspring.repository.CategoryRepository;
@@ -44,15 +45,19 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category updateCategory(Integer id, CategoryRequest request) {
 
-        return categoryRepository.findById(id)
-                .map(category1 -> {
-                    category1.setName(request.getName());
-                    category1.setDescription(request.getDescription());
+        Category existsCate = categoryRepository.findById(id)
+                .orElseThrow(() -> new BizException(ErrorCodeConst.INVALID_INPUT, "Category not found with id " + id));
 
-                    Category newCat = categoryRepository.save(category1);
-                    return newCat;
-                })
-                .orElseThrow(() -> new EntityNotFoundException("Category existed"));
+        // check another title same exists
+        categoryRepository.findCategoryByName(request.getName()).ifPresent(cat -> {
+            if (!cat.getId().equals(id)) {
+                throw new BizException(ErrorCodeConst.INVALID_INPUT,"Category with title " + request.getName() + " already exists");
+            }
+        });
+        existsCate.setName(request.getName());
+        existsCate.setDescription(request.getDescription());
+
+        return existsCate;
     }
 
     @Override

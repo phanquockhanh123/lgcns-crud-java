@@ -6,13 +6,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookRequest{
 
-        @NotNull(message = "Category name is required")
-        private Integer categoryId;
+        @NotNull(message = "List categories name is required")
+        private List<Integer> cateIds;
 
         @NotBlank(message = "Book title is required")
         private String title;

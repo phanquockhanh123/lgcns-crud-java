@@ -10,17 +10,20 @@ import org.example.socialmediaspring.entity.Book;
 import java.util.List;
 
 public interface BookService {
-    Book saveBook(BookRequest bookRequest);
+    BookCategoryDto saveBook(BookRequest bookRequest);
 
     PageResponse<BookResponse> findAllBooks(int page, int size, String title, String author);
 
-    BookResponse updateBook(Integer id, BookRequest request);
+    BookCategoryDto updateBook(Integer id, BookRequest request);
 
     BookResponse getBookById(Integer id);
 
     void deleteBook(Integer id);
 
-    PageResponse<BookCategoryDto> searchAllBooks(int page, int size, String title, String author, List<Integer> cateIds, Integer yearFrom, Integer yearTo);
+    //PageResponse<BookCategoryDto> searchAllBooks(int page, int size, String title, String author, List<Integer> cateIds, Integer yearFrom, Integer yearTo);
 
     String deleteBooksByIds(IdsRequest id);
+
+    String bulkBookService();
+
 }

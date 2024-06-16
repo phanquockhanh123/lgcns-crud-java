@@ -1,15 +1,16 @@
 package org.example.socialmediaspring.mapper;
 
+import org.example.socialmediaspring.dto.book.BookCategoryDto;
 import org.example.socialmediaspring.dto.book.BookRequest;
 import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.entity.Book;
+import org.example.socialmediaspring.entity.BookCategory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class BookMapper {
     public Book toBook(BookRequest request) {
         return Book.builder()
-                .categoryId(request.getCategoryId())
                 .title(request.getTitle())
                 .isbn(request.getIsbn())
                 .author(request.getAuthor())
@@ -24,7 +25,7 @@ public class BookMapper {
     public BookResponse toBookResponse(Book book) {
         return BookResponse.builder()
                 .id(book.getId())
-                .categoryId(book.getCategoryId())
+                //.categoryId(book.getCategoryId())
                 .title(book.getTitle())
                 .author(book.getAuthor())
                 .isbn(book.getIsbn())

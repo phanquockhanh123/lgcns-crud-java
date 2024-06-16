@@ -61,19 +61,19 @@ public class BookController {
         return responseFactory.success(null);
     }
 
-    @GetMapping("/search")
-    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read', 'user:read')")
-    public ResponseEntity searchBooksByConds(
-            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
-            @RequestParam(name = "size", defaultValue = "20", required = false) int size,
-            @RequestParam(name = "title", required = false) String title,
-            @RequestParam(name = "author", required = false) String author,
-            @RequestParam(name = "cateIds", required = false) List<Integer> cateIds,
-            @RequestParam(name = "yearFrom", required = false) Integer yearFrom,
-            @RequestParam(name = "yearTo", required = false) Integer yearTo
-    ) {
-        return responseFactory.success(bookService.searchAllBooks(page, size, title, author, cateIds, yearFrom, yearTo));
-    }
+//    @GetMapping("/search")
+//    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read', 'user:read')")
+//    public ResponseEntity searchBooksByConds(
+//            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+//            @RequestParam(name = "size", defaultValue = "20", required = false) int size,
+//            @RequestParam(name = "title", required = false) String title,
+//            @RequestParam(name = "author", required = false) String author,
+//            @RequestParam(name = "cateIds", required = false) List<Integer> cateIds,
+//            @RequestParam(name = "yearFrom", required = false) Integer yearFrom,
+//            @RequestParam(name = "yearTo", required = false) Integer yearTo
+//    ) {
+//        return responseFactory.success(bookService.searchAllBooks(page, size, title, author, cateIds, yearFrom, yearTo));
+//    }
 
     @DeleteMapping
     @PreAuthorize("hasAnyAuthority('admin:delete', 'manager:delete')")
@@ -81,4 +81,6 @@ public class BookController {
 
         return responseFactory.success(bookService.deleteBooksByIds(ids));
     }
+
+
 }

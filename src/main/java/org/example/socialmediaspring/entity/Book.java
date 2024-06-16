@@ -14,7 +14,6 @@ import org.example.socialmediaspring.common.BaseEntity;
 @Entity
 @Table(name = "books")
 public class Book extends BaseEntity {
-    private Integer categoryId;
     private String title;
     private String author;
     private String isbn;
@@ -23,5 +22,4 @@ public class Book extends BaseEntity {
     private Integer yearOfPublish;
     private Integer quantity = 0;
     private Integer quantityAvail = 0;
-
 }

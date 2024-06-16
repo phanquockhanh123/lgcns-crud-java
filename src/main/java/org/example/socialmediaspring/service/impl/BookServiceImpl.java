@@ -12,9 +12,13 @@ import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.book.BookRequest;
 import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.entity.Book;
+import org.example.socialmediaspring.entity.BookCategory;
+import org.example.socialmediaspring.entity.Category;
 import org.example.socialmediaspring.exception.BizException;
 import org.example.socialmediaspring.mapper.BookMapper;
+import org.example.socialmediaspring.repository.BookCategoryRepository;
 import org.example.socialmediaspring.repository.BookRepository;
+import org.example.socialmediaspring.repository.CategoryRepository;
 import org.example.socialmediaspring.service.BookService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +27,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.Year;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -38,11 +43,26 @@ public class BookServiceImpl implements BookService {
 
     private final IsbnGenerator isbnGenerator;
 
+    private final CategoryRepository categoryRepository;
+
+    private final BookCategoryRepository bookCategoryRepository;
+
+
+    private static final int BATCH_SIZE = 1000;
+
     @Override
-    public Book saveBook(BookRequest bookRequest) {
+    public BookCategoryDto saveBook(BookRequest bookRequest) {
 
         if (bookRepository.existsByTitle(bookRequest.getTitle())) {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "Book title existed");
+        }
+
+        // check list category ids exists db
+        for (Integer categoryId : bookRequest.getCateIds()) {
+            Optional<Category> category = categoryRepository.findById(categoryId);
+            if (category.isEmpty()) {
+                throw new BizException(ErrorCodeConst.VALIDATE_VIOLATION, "Category id " + categoryId + " does not exist.");
+            }
         }
 
         Book book = bookMapper.toBook(bookRequest);
@@ -50,7 +70,33 @@ public class BookServiceImpl implements BookService {
         book.setIsbn(isbnGenerator.generateISBN());
         book.setQuantityAvail(book.getQuantity());
 
-        return bookRepository.save(book);
+        Book savedBook =  bookRepository.save(book);
+
+        // save book_categories record
+        List<BookCategory> bookCategoriesEntity = new ArrayList<>();
+
+        for (Integer categoryId : bookRequest.getCateIds()) {
+            BookCategory bookCategory = new BookCategory();
+            bookCategory.setBookId(savedBook.getId());
+            bookCategory.setCategoryId(categoryId);
+
+            bookCategoriesEntity.add(bookCategory);
+        }
+        bookCategoryRepository.saveAll(bookCategoriesEntity);
+
+        return BookCategoryDto.builder()
+                .id(savedBook.getId())
+                .cateIds(bookRequest.getCateIds())
+                .title(savedBook.getTitle())
+                .author(savedBook.getAuthor())
+                .isbn(savedBook.getIsbn())
+                .price(savedBook.getPrice())
+                .yearOfPublish(savedBook.getYearOfPublish())
+                .quantity(savedBook.getQuantity())
+                .quantityAvail(savedBook.getQuantityAvail())
+                .created(savedBook.getCreated())
+                .modified(savedBook.getModified())
+                .build();
     }
 
     @Override
@@ -74,7 +120,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookResponse updateBook(Integer id, BookRequest request) {
+    public BookCategoryDto updateBook(Integer id, BookRequest request) {
         Book existsBook = bookRepository.findById(id)
                 .orElseThrow(() -> new BizException(ErrorCodeConst.INVALID_INPUT, "Book not found with id " + id));
 
@@ -85,18 +131,49 @@ public class BookServiceImpl implements BookService {
             }
         });
 
-       existsBook.setTitle(request.getTitle());
+        // check list category ids exists db
+        for (Integer categoryId : request.getCateIds()) {
+            Optional<Category> category = categoryRepository.findById(categoryId);
+            if (category.isEmpty()) {
+                throw new BizException(ErrorCodeConst.VALIDATE_VIOLATION, "Category id " + categoryId + " does not exist.");
+            }
+        }
+
+        existsBook.setTitle(request.getTitle());
         existsBook.setAuthor(request.getAuthor());
         existsBook.setPrice(request.getPrice());
         existsBook.setDescription(request.getDescription());
-        existsBook.setCategoryId(request.getCategoryId());
         existsBook.setQuantity(request.getQuantity());
         existsBook.setYearOfPublish(request.getYear());
 
-        Book rs =  bookRepository.save(existsBook);
-        BookResponse rsResponse = bookMapper.toBookResponse(rs);
+        Book savedBook =  bookRepository.save(existsBook);
 
-        return rsResponse;
+        // delete and create new book_categories
+        List<BookCategory> bookCategoriesEntity = new ArrayList<>();
+        bookCategoryRepository.deleteAllById(Collections.singleton(id));
+
+        for (Integer categoryId : request.getCateIds()) {
+            BookCategory bookCategory = new BookCategory();
+            bookCategory.setBookId(id);
+            bookCategory.setCategoryId(categoryId);
+
+            bookCategoriesEntity.add(bookCategory);
+        }
+        bookCategoryRepository.saveAll(bookCategoriesEntity);
+
+        return BookCategoryDto.builder()
+                .id(savedBook.getId())
+                .cateIds(request.getCateIds())
+                .title(savedBook.getTitle())
+                .author(savedBook.getAuthor())
+                .isbn(savedBook.getIsbn())
+                .price(savedBook.getPrice())
+                .yearOfPublish(savedBook.getYearOfPublish())
+                .quantity(savedBook.getQuantity())
+                .quantityAvail(savedBook.getQuantityAvail())
+                .created(savedBook.getCreated())
+                .modified(savedBook.getModified())
+                .build();
     }
 
     @Override
@@ -115,29 +192,39 @@ public class BookServiceImpl implements BookService {
         bookRepository.deleteById(id);
     }
 
-    @Override
-    public PageResponse<BookCategoryDto> searchAllBooks(int page, int size, String title, String author, List<Integer> cateIds, Integer yearFrom, Integer yearTo) {
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("created").descending());
-
-        Page<BookCategoryDto> books = bookRepository.searchBooksByConds(pageable, title, author, cateIds, yearFrom, yearTo);
-
-        System.out.println("Result books: {}" + books);
-        List<BookCategoryDto> booksResponse = books.stream().toList();
-        return new PageResponse<>(
-                booksResponse,
-                books.getNumber(),
-                books.getSize(),
-                books.getTotalElements(),
-                books.getTotalPages(),
-                books.isFirst(),
-                books.isLast()
-        );
-    }
+//    @Override
+//    public PageResponse<BookCategoryDto> searchAllBooks(int page, int size, String title, String author, List<Integer> cateIds, Integer yearFrom, Integer yearTo) {
+//
+//        Pageable pageable = PageRequest.of(page, size, Sort.by("created").descending());
+//
+//        Page<BookCategoryDto> books = bookRepository.searchBooksByConds(pageable, title, author, cateIds, yearFrom, yearTo);
+//
+//        System.out.println("Result books: {}" + books);
+//        List<BookCategoryDto> booksResponse = books.stream().toList();
+//        return new PageResponse<>(
+//                booksResponse,
+//                books.getNumber(),
+//                books.getSize(),
+//                books.getTotalElements(),
+//                books.getTotalPages(),
+//                books.isFirst(),
+//                books.isLast()
+//        );
+//    }
 
     @Override
     @Transactional
     public String deleteBooksByIds(IdsRequest ids) {
+        // check all ids not exists
+        // check list category ids exists db
+        for (Integer bookId : ids.getIds()) {
+            Optional<Book> book = bookRepository.findById(bookId);
+            if (book.isEmpty()) {
+                throw new BizException(ErrorCodeConst.VALIDATE_VIOLATION, "Book id " + bookId + " does not exist.");
+            }
+        }
+
+        bookCategoryRepository.deleteAllByBookId(ids.getIds());
         bookRepository.deleteAllById(ids.getIds());
 
         StringBuilder message = new StringBuilder();
@@ -147,4 +234,60 @@ public class BookServiceImpl implements BookService {
 
     }
 
+    @Override
+    @Transactional
+    public String bulkBookService() {
+        Random random = new Random();
+
+        List<Book> booksEntity = new ArrayList<>();
+        // get list category id
+        List<Integer> cateIds = categoryRepository.findIdsCategory();
+
+        if (cateIds.isEmpty()) {
+            throw new BizException(ErrorCodeConst.VALIDATE_VIOLATION, "Category id null, dont create book");
+        }
+
+        Integer maxTitleNumber = bookRepository.findMaxTitleNumber();
+
+        int maxTitleId = maxTitleNumber != null ? maxTitleNumber.intValue() : 0;
+        System.out.println(maxTitleId + 123);
+        for (int i = 0; i < 10000; i++) {
+            Book book = new Book();
+
+            book.setTitle("title-book-bulk-" + (maxTitleId + i));
+            book.setAuthor("author-book-bulk-" + (maxTitleId + i));
+            book.setPrice((long) random.nextInt(1000));
+            book.setQuantity(random.nextInt(100));
+            book.setIsbn(isbnGenerator.generateISBN());
+            book.setQuantityAvail(20);
+            book.setYearOfPublish(getRandomYear());
+            book.setDescription("description-bulk-" + maxTitleId + i);
+
+            booksEntity.add(book);
+        }
+
+        // handle batch data
+        int i = 0;
+
+        for (Book book : booksEntity) {
+            entityManager.persist(book);
+            i++;
+            if (i % BATCH_SIZE == 0) {
+                entityManager.flush();
+                entityManager.clear();
+            }
+        }
+        entityManager.flush();
+        entityManager.clear();
+        //bookRepository.saveAll(booksEntity);
+
+        return "Bulk insert data successfully!";
+    }
+
+    public int getRandomYear() {
+        int currentYear = Year.now().getValue();
+        int startYear = 2010;
+        Random random = new Random();
+        return startYear + random.nextInt(currentYear - startYear + 1);
+    }
 }

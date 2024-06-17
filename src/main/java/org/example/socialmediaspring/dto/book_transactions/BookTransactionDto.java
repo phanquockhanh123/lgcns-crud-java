@@ -16,7 +16,6 @@ public class BookTransactionDto {
     private Integer bookId;
     private Integer userId;
     private UUID transactionId;
-    private Integer type;
     private Integer status;
     private Integer quantity;
     private Integer amount;

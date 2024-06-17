@@ -37,4 +37,7 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     @Query("SELECT MAX(CAST(SUBSTRING(b.title, 16) AS int)) FROM Book b WHERE b.title LIKE 'title-book-bulk-%'")
     Integer findMaxTitleNumber();
 
+    @Query(value = "SELECT * FROM books b where b.id = :bookId ", nativeQuery = true)
+    Book findBookById(Integer bookId);
+
 }

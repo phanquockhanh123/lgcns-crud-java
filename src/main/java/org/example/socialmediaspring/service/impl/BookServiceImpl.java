@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.common.IsbnGenerator;
 import org.example.socialmediaspring.common.PageResponse;
+import org.example.socialmediaspring.constant.Common;
 import org.example.socialmediaspring.constant.ErrorCodeConst;
 import org.example.socialmediaspring.dto.book.BookCategoryDto;
+import org.example.socialmediaspring.dto.book.SearchBookRequest;
 import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.book.BookRequest;
 import org.example.socialmediaspring.dto.book.BookResponse;
@@ -16,14 +18,11 @@ import org.example.socialmediaspring.entity.BookCategory;
 import org.example.socialmediaspring.entity.Category;
 import org.example.socialmediaspring.exception.BizException;
 import org.example.socialmediaspring.mapper.BookMapper;
-import org.example.socialmediaspring.repository.BookCategoryRepository;
-import org.example.socialmediaspring.repository.BookRepository;
-import org.example.socialmediaspring.repository.CategoryRepository;
+import org.example.socialmediaspring.repository.*;
 import org.example.socialmediaspring.service.BookService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.example.socialmediaspring.utils.JsonUtils;
+import org.springframework.data.domain.*;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +45,8 @@ public class BookServiceImpl implements BookService {
     private final CategoryRepository categoryRepository;
 
     private final BookCategoryRepository bookCategoryRepository;
+
+    private final BookCustomRepositoryImpl bookCustomRepositoryImpl;
 
 
     private static final int BATCH_SIZE = 1000;
@@ -86,7 +87,7 @@ public class BookServiceImpl implements BookService {
 
         return BookCategoryDto.builder()
                 .id(savedBook.getId())
-                .cateIds(bookRequest.getCateIds())
+                //.cateIds(bookRequest.getCateIds())
                 .title(savedBook.getTitle())
                 .author(savedBook.getAuthor())
                 .isbn(savedBook.getIsbn())
@@ -98,27 +99,6 @@ public class BookServiceImpl implements BookService {
                 .modified(savedBook.getModified())
                 .build();
     }
-
-    @Override
-    public PageResponse<BookResponse> findAllBooks(int page, int size, String title, String author) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("created").descending());
-
-
-        Page<Book> books = bookRepository.findBooksByConds(pageable, title, author);
-        List<BookResponse> booksResponse = books.stream()
-                .map(bookMapper::toBookResponse)
-                .toList();
-        return new PageResponse<>(
-                booksResponse,
-                books.getNumber(),
-                books.getSize(),
-                books.getTotalElements(),
-                books.getTotalPages(),
-                books.isFirst(),
-                books.isLast()
-        );
-    }
-
     @Override
     public BookCategoryDto updateBook(Integer id, BookRequest request) {
         Book existsBook = bookRepository.findById(id)
@@ -163,7 +143,7 @@ public class BookServiceImpl implements BookService {
 
         return BookCategoryDto.builder()
                 .id(savedBook.getId())
-                .cateIds(request.getCateIds())
+                //.cateIds(request.getCateIds())
                 .title(savedBook.getTitle())
                 .author(savedBook.getAuthor())
                 .isbn(savedBook.getIsbn())
@@ -192,25 +172,30 @@ public class BookServiceImpl implements BookService {
         bookRepository.deleteById(id);
     }
 
-//    @Override
-//    public PageResponse<BookCategoryDto> searchAllBooks(int page, int size, String title, String author, List<Integer> cateIds, Integer yearFrom, Integer yearTo) {
-//
-//        Pageable pageable = PageRequest.of(page, size, Sort.by("created").descending());
-//
-//        Page<BookCategoryDto> books = bookRepository.searchBooksByConds(pageable, title, author, cateIds, yearFrom, yearTo);
-//
-//        System.out.println("Result books: {}" + books);
-//        List<BookCategoryDto> booksResponse = books.stream().toList();
-//        return new PageResponse<>(
-//                booksResponse,
-//                books.getNumber(),
-//                books.getSize(),
-//                books.getTotalElements(),
-//                books.getTotalPages(),
-//                books.isFirst(),
-//                books.isLast()
-//        );
-//    }
+    @Override
+    public PageResponse<BookResponse> searchAllBooks(SearchBookRequest searchReq) {
+
+        log.info("start search ightk bill. body: {}", JsonUtils.objToString(searchReq));
+        PageRequest pageable = Common.getPageRequest(searchReq.getPage() - 1, searchReq.getLimit(), null);
+
+        Pair<Long, List<BookResponse>> booksData = bookCustomRepositoryImpl.getBooksByConds(searchReq, pageable);
+        Long countBooks = booksData.getFirst();
+        List<BookResponse> listBooks = booksData.getSecond();
+
+        Page<BookResponse> pageBookDto = new PageImpl<>(listBooks, pageable, countBooks);
+
+        PageResponse<BookResponse> ib = PageResponse.<BookResponse>builder()
+                .data(listBooks)
+                .build();
+
+        if (Objects.nonNull(searchReq.getGetTotalCount()) && Boolean.TRUE.equals(searchReq.getGetTotalCount())) {
+            ib.setPagination(this.buildPagination(pageBookDto.getSize(), pageBookDto.getTotalPages(),
+                    pageBookDto.getNumber() + 1, pageBookDto.getTotalElements()));
+        }
+
+        log.info("end ...");
+        return ib;
+    }
 
     @Override
     @Transactional
@@ -290,4 +275,18 @@ public class BookServiceImpl implements BookService {
         Random random = new Random();
         return startYear + random.nextInt(currentYear - startYear + 1);
     }
+
+    private Map<String, Long> buildPagination(Integer limit, Integer totalPage, Integer currentPage, Long totalRecord){
+        log.info("start buildPagination ...");
+
+        Map<String, Long> pagination = new HashMap<>();
+        pagination.put("limit", Long.valueOf(limit));
+        pagination.put("total_page", Long.valueOf(totalPage));
+        pagination.put("current_page", Long.valueOf(currentPage));
+        pagination.put("total_record", totalRecord);
+
+        log.info("end buildPagination ...");
+        return pagination;
+    }
+
 }

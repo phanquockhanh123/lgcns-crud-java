@@ -38,8 +38,9 @@ public class BookTransactionController {
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "size", defaultValue = "20", required = false) int size,
             @RequestParam(name = "status", required = false) Integer status,
-            @RequestParam(name = "tranIds", required = false) List<String> tranIds
+            @RequestParam(name = "tranIds", required = false) List<String> tranIds,
+            @RequestParam(name = "userIds", required = false) List<Integer> userIds
     ) {
-        return responseFactory.success(bookTransactionService.getBookTransByConds(page, size, status, tranIds));
+        return responseFactory.success(bookTransactionService.getBookTransByConds(page, size, status, tranIds, userIds));
     }
 }

@@ -3,6 +3,7 @@ package org.example.socialmediaspring.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.socialmediaspring.common.ResponseFactory;
+import org.example.socialmediaspring.dto.book.SearchBookRequest;
 import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.book.BookRequest;
 import org.example.socialmediaspring.service.BookService;
@@ -29,17 +30,6 @@ public class BookController {
         return responseFactory.success(bookService.saveBook(request));
     }
 
-    @GetMapping
-    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read', 'user:read')")
-    public ResponseEntity findAllBooks(
-            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
-            @RequestParam(name = "size", defaultValue = "20", required = false) int size,
-            @RequestParam(name = "title", required = false) String title,
-            @RequestParam(name = "author", required = false) String author
-    ) {
-        return responseFactory.success(bookService.findAllBooks(page, size, title, author));
-    }
-
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('admin:update', 'manager:update')")
     public ResponseEntity updateBook(
@@ -61,19 +51,19 @@ public class BookController {
         return responseFactory.success(null);
     }
 
-//    @GetMapping("/search")
-//    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read', 'user:read')")
-//    public ResponseEntity searchBooksByConds(
-//            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
-//            @RequestParam(name = "size", defaultValue = "20", required = false) int size,
-//            @RequestParam(name = "title", required = false) String title,
-//            @RequestParam(name = "author", required = false) String author,
-//            @RequestParam(name = "cateIds", required = false) List<Integer> cateIds,
-//            @RequestParam(name = "yearFrom", required = false) Integer yearFrom,
-//            @RequestParam(name = "yearTo", required = false) Integer yearTo
-//    ) {
-//        return responseFactory.success(bookService.searchAllBooks(page, size, title, author, cateIds, yearFrom, yearTo));
-//    }
+    @GetMapping
+    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read', 'user:read')")
+    public ResponseEntity searchBooksByConds(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(name = "limit", defaultValue = "20", required = false) int limit,
+            @RequestParam(name = "get_total_count", required = false) Boolean getTotalCount,
+            @RequestParam(name = "title", required = false) String title,
+            @RequestParam(name = "author", required = false) String author,
+            @RequestParam(name = "yearFrom", required = false) Integer yearFrom,
+            @RequestParam(name = "yearTo", required = false) Integer yearTo
+    ) {
+        return responseFactory.success(bookService.searchAllBooks(new SearchBookRequest(page, limit, getTotalCount, title, author, yearFrom, yearTo)));
+    }
 
     @DeleteMapping
     @PreAuthorize("hasAnyAuthority('admin:delete', 'manager:delete')")

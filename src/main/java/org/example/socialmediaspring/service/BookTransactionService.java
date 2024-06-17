@@ -16,6 +16,6 @@ public interface BookTransactionService {
 
     BookTransaction returnBook(BookTransIdsRequest request);
 
-    PageResponse<BookTransaction> getBookTransByConds(int page,int  size,Integer status,List<String> tranIds);
+    PageResponse<BookTransaction> getBookTransByConds(int page,int  size,Integer status,List<String> tranIds, List<Integer> userIds);
 
 }

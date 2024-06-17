@@ -9,6 +9,7 @@ import org.example.socialmediaspring.dto.book_transactions.BookTransSearchReques
 import org.example.socialmediaspring.dto.book_transactions.BookTransactionDto;
 import org.example.socialmediaspring.dto.book_transactions.BookTransactionRequest;
 import org.example.socialmediaspring.entity.Book;
+import org.example.socialmediaspring.entity.BookCategory;
 import org.example.socialmediaspring.entity.BookTransaction;
 import org.example.socialmediaspring.entity.User;
 import org.example.socialmediaspring.exception.BizException;
@@ -31,6 +32,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,6 +58,11 @@ public class BookTransactionServiceImpl implements BookTransactionService {
         User userInfo = userRepository.findUsersByUsername(currentUser.getUsername());
         // check quantity avail book id > 0
         Book book = bookRepository.findBookById(request.getBookId());
+
+        // check book exists
+        if (book == null) {
+            throw new BizException(ErrorCodeConst.INVALID_INPUT, "Book no exists");
+        }
 
         if (book.getQuantityAvail() <= 0) {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "So luong sach khong du cung cap");
@@ -98,18 +105,21 @@ public class BookTransactionServiceImpl implements BookTransactionService {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "Khong co giao dich can thanh toan");
         }
 
+        List<UUID> bookTransIds = new ArrayList<>();
         for (BookTransaction bookTransaction : bookTransactions) {
-
+            bookTransIds.add(bookTransaction.getTransactionId());
         }
+
+        bookTransactionRepository.updateTransactionStatus(bookTransIds);
         return null;
     }
 
     @Override
-    public PageResponse<BookTransaction> getBookTransByConds(int page, int size, Integer status, List<String> tranIds) {
+    public PageResponse<BookTransaction> getBookTransByConds(int page, int size, Integer status, List<String> tranIds, List<Integer> userIds) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("created").descending());
 
-        Page<BookTransaction> bookTrans = bookTransactionRepository.searchBooksByConds(pageable, status, tranIds);
+        Page<BookTransaction> bookTrans = bookTransactionRepository.searchBookTransByConds(pageable, status, tranIds, userIds);
 
         System.out.println("Result books: {}" + bookTrans);
         List<BookTransaction> booksTransResponse = bookTrans.stream().toList();

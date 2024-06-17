@@ -16,7 +16,6 @@ public class BookCategoryDto {
     private Integer id;
     private String title;
     private String author;
-    private List<Integer> cateIds;
     private String isbn;
     private Long price;
     private Integer quantity;

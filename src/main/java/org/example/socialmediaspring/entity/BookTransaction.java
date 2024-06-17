@@ -28,7 +28,7 @@ public class BookTransaction extends BaseEntity {
     private Integer amount;
     private Integer bonus;
     private LocalDateTime startDate;
-    private LocalDateTime  endDate;
-    private Date returnDate;
+    private LocalDateTime endDate;
+    private LocalDateTime returnDate;
 
 }

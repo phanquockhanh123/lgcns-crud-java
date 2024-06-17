@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface BookTransactionRepository extends JpaRepository<BookTransaction, Integer> {
     @Query(value = "SELECT * FROM book_transactions b where b.book_transaction_id in (:bookTransId) ", nativeQuery = true)
@@ -23,12 +24,17 @@ public interface BookTransactionRepository extends JpaRepository<BookTransaction
     @Modifying
     @Transactional
     @Query("UPDATE BookTransaction bt SET bt.status = 1 WHERE bt.status = 0 AND bt.transactionId in (:transactionId) ")
-    void updateTransactionStatus(List<String> transactionId);
+    void updateTransactionStatus(List<UUID> transactionId);
 
-        @Query(value = "SELECT new org.example.socialmediaspring.dto.book_transactions.BookTransactionDto(bt.id, bt.bookId, bt.userId, bt.transactionId, bt.status, bt.quantity, bt.amount, bt.bonus, bt.startDate, bt.endDate, bt.returnDate) " +
+        @Query(value = "SELECT new org.example.socialmediaspring.dto.book_transactions.BookTransactionDto(bt.id, b.title, u.email, u.phone, bt.transactionId, bt.status, bt.quantity, bt.amount, bt.bonus, bt.startDate, bt.endDate, bt.returnDate) " +
                 " FROM BookTransaction bt " +
+                " JOIN Book b " +
+                " ON bt.bookId = b.id " +
+                " JOIN User u " +
+                " ON bt.userId = u.id " +
             " WHERE (:status is null OR bt.status = :status) " +
+            " AND (:userIds is null OR bt.userId in (:userIds)) " +
             " AND (:tranIds is null OR bt.transactionId in (:tranIds)) ")
-    Page<BookTransaction> searchBooksByConds(Pageable pageable, Integer status, List<String> tranIds);
+    Page<BookTransaction> searchBookTransByConds(Pageable pageable, Integer status, List<String> tranIds, List<Integer> userIds);
 
 }

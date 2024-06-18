@@ -62,7 +62,7 @@ public class BookController {
             @RequestParam(name = "yearFrom", required = false) Integer yearFrom,
             @RequestParam(name = "yearTo", required = false) Integer yearTo
     ) {
-        return responseFactory.success(bookService.searchAllBooks(new SearchBookRequest(page, limit, getTotalCount, title, author, yearFrom, yearTo)));
+        return responseFactory.success(bookService.searchAllBooks(new SearchBookRequest(limit, page, getTotalCount, title, author, yearFrom, yearTo)));
     }
 
     @DeleteMapping

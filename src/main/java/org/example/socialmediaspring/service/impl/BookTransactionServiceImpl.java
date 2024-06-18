@@ -73,7 +73,7 @@ public class BookTransactionServiceImpl implements BookTransactionService {
         }
         BookTransaction bt = new BookTransaction();
 
-        Long durationInHours = (request.getEndDate() - request.getStartDate()) / 3600000;
+        Long durationInHours = (request.getEndDate() - request.getStartDate()) /  86400000;
 
         bt.setBookId(request.getBookId());
         bt.setUserId(Math.toIntExact(userInfo.getId()));
@@ -85,8 +85,8 @@ public class BookTransactionServiceImpl implements BookTransactionService {
         bt.setStatus(0);
         bt.setTransactionId(UUID.randomUUID());
 
-        // handle case quantity - 1 books table
-        book.setQuantityAvail(book.getQuantityAvail() - 1);
+        // handle case quantity - quantity borrow books table
+        book.setQuantityAvail(book.getQuantityAvail() - request.getQuantity());
 
         bookRepository.save(book);
 

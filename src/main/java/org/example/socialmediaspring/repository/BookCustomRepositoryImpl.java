@@ -1,7 +1,8 @@
 package org.example.socialmediaspring.repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.dto.book.BookResponse;
@@ -16,6 +17,7 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class BookCustomRepositoryImpl implements BookCustomRepository{
+    @PersistenceContext
     private final EntityManager em;
 
     @Override
@@ -27,15 +29,16 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
 
         StringBuilder sql = this.buildMainQuery();
         sql.append(conditions);
-        javax.persistence.Query query = em.createQuery(sql.toString(), BookResponse.class)
+        jakarta.persistence.Query query = em.createQuery(sql.toString(), BookResponse.class)
                 .setFirstResult(pageable.getPageSize() * pageable.getPageNumber())
                 .setMaxResults(pageable.getPageSize());
         this.setParameters(parameters, query);
+
         var listBooks = query.getResultList();
 
         StringBuilder sqlCount = this.buildCountQuery();
         sqlCount.append(conditions);
-        javax.persistence.Query queryCount = em.createQuery(sqlCount.toString());
+        jakarta.persistence.Query queryCount = em.createQuery(sqlCount.toString());
         this.setParameters(parameters, queryCount);
         Long count = ((Number) queryCount.getSingleResult()).longValue();
 
@@ -45,25 +48,26 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
 
     private StringBuilder buildMainQuery() {
         StringBuilder sql = new StringBuilder();
-        sql.append("select new org.example.socialmediaspring.dto.book.BookCategoryDto(" +
-                        "b.id, " +
-                        "b.title, " +
-                        "b.author, " +
-                        "b.isbn, " +
-                        "b.price, " +
-                        "b.quantity, " +
-                        "b.quantityAvail, " +
-                        "b.yearOfPublish, " +
-                        "UNIX_TIMESTAMP(b.created), " +
-                        "UNIX_TIMESTAMP(b.modified) ")
-                .append("from Book b ");
+        sql.append("SELECT new org.example.socialmediaspring.dto.book.BookResponse(")
+                .append("b.id, ")
+                .append("b.title, ")
+                .append("b.author, ")
+                .append("b.isbn, ")
+                .append("b.description, ")
+                .append("b.price, ")
+                .append("b.yearOfPublish, ")
+                .append("b.quantity, ")
+                .append("b.quantityAvail, ")
+                .append("b.created, ")
+                .append("b.modified) ")
+                .append("FROM Book b ");
         return sql;
     }
 
     private StringBuilder buildCountQuery() {
         StringBuilder sql = new StringBuilder();
         sql.append("select count(id) ")
-                .append("from Book b ");
+                .append(" from Book b ");
         return sql;
     }
 
@@ -71,17 +75,17 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
         Map<String,Object> mapParameter = new HashMap<>();
         StringBuilder sql = new StringBuilder();
 
-        sql.append("where 1 = 1 ");
+        sql.append(" where 1 = 1 ");
 
         if (Objects.nonNull(searchReq.getAuthor()) && !searchReq.getAuthor().isEmpty()) {
             String author = searchReq.getAuthor();
             sql.append("and b.author LIKE :author ");
-            mapParameter.put("author", author);
+            mapParameter.put("author", "%" + author + "%");
         }
         if (Objects.nonNull(searchReq.getTitle()) && !searchReq.getTitle().isEmpty()) {
             String title = searchReq.getTitle();
-            sql.append("and b.title = :title ");
-            mapParameter.put("title", title);
+            sql.append("and b.title LIKE :title ");
+            mapParameter.put("title", "%" + title + "%");
         }
 //        if (Objects.nonNull(searchReq.getCateIds())) {
 //            Set<Integer> cateIds = searchReq.getCateIds();
@@ -98,6 +102,8 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
             sql.append("and b.yearOfPublish <= :yearTo ");
             mapParameter.put("yearTo", yearTo);
         }
+
+        sql.append("ORDER BY b.created DESC ");
 
         return Pair.of(sql, mapParameter);
     }

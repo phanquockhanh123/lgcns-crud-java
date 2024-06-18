@@ -14,12 +14,7 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PageResponse<T> {
+public class PageNewResponse<T> {
     private List<T> data;
-    private int number;
-    private int size;
-    private long totalElements;
-    private int totalPages;
-    private boolean first;
-    private boolean last;
+    private Map pagination;
 }

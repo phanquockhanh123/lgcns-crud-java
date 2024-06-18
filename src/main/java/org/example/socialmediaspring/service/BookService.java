@@ -1,5 +1,6 @@
 package org.example.socialmediaspring.service;
 
+import org.example.socialmediaspring.common.PageNewResponse;
 import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.dto.book.BookCategoryDto;
 import org.example.socialmediaspring.dto.book.SearchBookRequest;
@@ -19,7 +20,7 @@ public interface BookService {
 
     void deleteBook(Integer id);
 
-    PageResponse<BookResponse> searchAllBooks(SearchBookRequest request);
+    PageNewResponse<BookResponse> searchAllBooks(SearchBookRequest request);
 
     String deleteBooksByIds(IdsRequest id);
 

@@ -5,6 +5,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.common.IsbnGenerator;
+import org.example.socialmediaspring.common.PageNewResponse;
 import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.constant.Common;
 import org.example.socialmediaspring.constant.ErrorCodeConst;
@@ -87,7 +88,7 @@ public class BookServiceImpl implements BookService {
 
         return BookCategoryDto.builder()
                 .id(savedBook.getId())
-                //.cateIds(bookRequest.getCateIds())
+                .cateIds(bookRequest.getCateIds())
                 .title(savedBook.getTitle())
                 .author(savedBook.getAuthor())
                 .isbn(savedBook.getIsbn())
@@ -130,7 +131,8 @@ public class BookServiceImpl implements BookService {
 
         // delete and create new book_categories
         List<BookCategory> bookCategoriesEntity = new ArrayList<>();
-        bookCategoryRepository.deleteAllById(Collections.singleton(id));
+
+        bookCategoryRepository.deleteBookCateByBookId(id);
 
         for (Integer categoryId : request.getCateIds()) {
             BookCategory bookCategory = new BookCategory();
@@ -143,7 +145,7 @@ public class BookServiceImpl implements BookService {
 
         return BookCategoryDto.builder()
                 .id(savedBook.getId())
-                //.cateIds(request.getCateIds())
+                .cateIds(request.getCateIds())
                 .title(savedBook.getTitle())
                 .author(savedBook.getAuthor())
                 .isbn(savedBook.getIsbn())
@@ -173,7 +175,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public PageResponse<BookResponse> searchAllBooks(SearchBookRequest searchReq) {
+    public PageNewResponse<BookResponse> searchAllBooks(SearchBookRequest searchReq) {
 
         log.info("start search ightk bill. body: {}", JsonUtils.objToString(searchReq));
         PageRequest pageable = Common.getPageRequest(searchReq.getPage() - 1, searchReq.getLimit(), null);
@@ -184,7 +186,7 @@ public class BookServiceImpl implements BookService {
 
         Page<BookResponse> pageBookDto = new PageImpl<>(listBooks, pageable, countBooks);
 
-        PageResponse<BookResponse> ib = PageResponse.<BookResponse>builder()
+        PageNewResponse<BookResponse> ib = PageNewResponse.<BookResponse>builder()
                 .data(listBooks)
                 .build();
 

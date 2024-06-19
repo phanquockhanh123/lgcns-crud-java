@@ -18,7 +18,7 @@ import java.util.List;
 @Builder
 public class BookResponse {
     private Integer id;
-//    private List<String> cateNames;
+    private String cateNames;
     private String title;
     private String author;
     private String isbn;
@@ -29,4 +29,6 @@ public class BookResponse {
     private Integer quantityAvail;
     private Date created;
     private Date modified;
+
+
 }

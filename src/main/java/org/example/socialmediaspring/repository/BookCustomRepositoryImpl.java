@@ -50,8 +50,10 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
 
     private StringBuilder buildMainQuery() {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT new org.example.socialmediaspring.dto.book.BookResponse(")
+        sql.append("SELECT ")
+                .append("new org.example.socialmediaspring.dto.book.BookResponse( ")
                 .append("b.id, ")
+                .append("LISTAGG(c.name, ',') WITHIN GROUP (ORDER BY c.name) AS categoryNames, ")
                 .append("b.title, ")
                 .append("b.author, ")
                 .append("b.isbn, ")
@@ -61,8 +63,11 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
                 .append("b.quantity, ")
                 .append("b.quantityAvail, ")
                 .append("b.created, ")
-                .append("b.modified) ")
-                .append("FROM Book b ");
+                .append("b.modified ")
+                .append(") ")
+                .append("FROM Book b ")
+                .append("INNER JOIN BookCategory bc ON b.id = bc.bookId ")
+                .append("INNER JOIN Category c ON c.id = bc.categoryId ");
         return sql;
     }
 
@@ -105,7 +110,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
             mapParameter.put("yearTo", yearTo);
         }
 
-        sql.append("ORDER BY b.created DESC ");
+        sql.append(" GROUP BY b.id ORDER BY b.created DESC");
 
         return Pair.of(sql, mapParameter);
     }

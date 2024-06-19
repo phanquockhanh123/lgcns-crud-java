@@ -15,6 +15,9 @@ import java.util.UUID;
 public class BookTransactionDto {
     private Integer id;
     private String bookTitle;
+    private String bookAuthor;
+    private String bookIsbn;
+    private Long bookPrice;
     private String email;
     private String phone;
     private UUID transactionId;

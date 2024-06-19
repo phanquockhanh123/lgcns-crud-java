@@ -8,6 +8,7 @@ import org.example.socialmediaspring.dto.common.LongIdsRequest;
 import org.example.socialmediaspring.dto.common.ReqRes;
 import org.example.socialmediaspring.dto.user.UserRequest;
 import org.example.socialmediaspring.dto.user.UserResponse;
+import org.example.socialmediaspring.entity.Role;
 import org.example.socialmediaspring.entity.User;
 
 import java.security.Principal;
@@ -22,7 +23,7 @@ public interface UserService {
 
     User getUser(Long userId);
 
-    PageResponse<UserResponse> findUsers(int page, int size);
+    PageResponse<UserResponse> findUsers(int page, int size, Role role, String email);
 
     String changePassword(ChangePasswordRequest request, Principal connectedUser);
 }

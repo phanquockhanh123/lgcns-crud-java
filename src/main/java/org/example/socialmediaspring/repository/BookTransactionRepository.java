@@ -2,6 +2,7 @@ package org.example.socialmediaspring.repository;
 
 import org.example.socialmediaspring.dto.book.BookCategoryDto;
 import org.example.socialmediaspring.dto.book_transactions.BookTransSearchRequest;
+import org.example.socialmediaspring.dto.book_transactions.BookTransactionDto;
 import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.entity.BookTransaction;
 import org.example.socialmediaspring.entity.Category;
@@ -26,15 +27,14 @@ public interface BookTransactionRepository extends JpaRepository<BookTransaction
     @Query("UPDATE BookTransaction bt SET bt.status = 1 WHERE bt.status = 0 AND bt.transactionId in (:transactionId) ")
     void updateTransactionStatus(List<UUID> transactionId);
 
-        @Query(value = "SELECT new org.example.socialmediaspring.dto.book_transactions.BookTransactionDto(bt.id, b.title, u.email, u.phone, bt.transactionId, bt.status, bt.quantity, bt.amount, bt.bonus, bt.startDate, bt.endDate, bt.returnDate) " +
-                " FROM BookTransaction bt " +
-                " JOIN Book b " +
-                " ON bt.bookId = b.id " +
-                " JOIN User u " +
-                " ON bt.userId = u.id " +
-            " WHERE (:status is null OR bt.status = :status) " +
-            " AND (:userIds is null OR bt.userId in (:userIds)) " +
-            " AND (:tranIds is null OR bt.transactionId in (:tranIds)) ")
-    Page<BookTransaction> searchBookTransByConds(Pageable pageable, Integer status, List<String> tranIds, List<Integer> userIds);
+//    @Query(value = "SELECT new org.example.socialmediaspring.dto.book_transactions.BookTransactionDto(bt.id, b.title, u.email, u.phone, bt.transactionId, bt.status, bt.quantity, bt.amount, bt.bonus, bt.startDate, bt.endDate, bt.returnDate) " +
+//            " FROM BookTransaction bt " +
+//            " JOIN Book b " +
+//            " ON bt.bookId = b.id " +
+//            " JOIN User u " +
+//            " ON bt.userId = u.id " +
+//        " WHERE (:status is null OR bt.status = :status) " +
+//        " AND (:userIds is null OR bt.userId in (:userIds)) ")
+//    Page<BookTransactionDto> searchBookTransByConds(Pageable pageable, Integer status, List<Integer> userIds);
 
 }

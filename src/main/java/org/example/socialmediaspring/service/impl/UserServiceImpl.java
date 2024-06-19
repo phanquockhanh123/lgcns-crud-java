@@ -119,14 +119,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageResponse<UserResponse> findUsers(int page, int size) {
+    public PageResponse<UserResponse> findUsers(int page, int size, Role role, String email) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("created").descending());
 
         UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         String currentUsername = currentUser.getUsername();
 
-        Page<UserResponse> users = userRepository.findUsersByConds(pageable);
+        Page<UserResponse> users = userRepository.findUsersByConds(pageable, role, email);
 
         System.out.println("Result users: {}" + users);
         List<UserResponse> userResponse = users.stream().filter(user -> !user.getUserName().equals(currentUsername))

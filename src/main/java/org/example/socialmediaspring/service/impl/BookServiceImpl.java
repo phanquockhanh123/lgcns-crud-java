@@ -177,7 +177,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public PageNewResponse<BookResponse> searchAllBooks(SearchBookRequest searchReq) {
 
-        log.info("start search ightk bill. body: {}", JsonUtils.objToString(searchReq));
+        log.info("start search all books. body: {}", JsonUtils.objToString(searchReq));
         PageRequest pageable = Common.getPageRequest(searchReq.getPage() - 1, searchReq.getLimit(), null);
 
         Pair<Long, List<BookResponse>> booksData = bookCustomRepositoryImpl.getBooksByConds(searchReq, pageable);

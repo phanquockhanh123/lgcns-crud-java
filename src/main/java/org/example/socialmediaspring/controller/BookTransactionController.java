@@ -4,9 +4,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.socialmediaspring.common.ResponseFactory;
 import org.example.socialmediaspring.dto.book.BookRequest;
+import org.example.socialmediaspring.dto.book.SearchBookRequest;
 import org.example.socialmediaspring.dto.book_transactions.BookTransIdsRequest;
 import org.example.socialmediaspring.dto.book_transactions.BookTransSearchRequest;
 import org.example.socialmediaspring.dto.book_transactions.BookTransactionRequest;
+import org.example.socialmediaspring.dto.book_transactions.SearchBookTransactionDto;
 import org.example.socialmediaspring.service.BookTransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,11 +38,12 @@ public class BookTransactionController {
     @GetMapping
     public ResponseEntity searchBookTransByConds(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
-            @RequestParam(name = "size", defaultValue = "20", required = false) int size,
+            @RequestParam(name = "limit", defaultValue = "20", required = false) int limit,
+            @RequestParam(name = "get_total_count", defaultValue = "false", required = false) Boolean getTotalCount,
+            @RequestParam(name = "userId", required = false) Boolean userId,
             @RequestParam(name = "status", required = false) Integer status,
-            @RequestParam(name = "tranIds", required = false) List<String> tranIds,
-            @RequestParam(name = "userIds", required = false) List<Integer> userIds
+            Principal connectedUser
     ) {
-        return responseFactory.success(bookTransactionService.getBookTransByConds(page, size, status, tranIds, userIds));
+        return responseFactory.success(bookTransactionService.getBookTransByConds(new SearchBookTransactionDto(limit, page, getTotalCount, userId, status), connectedUser));
     }
 }

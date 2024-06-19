@@ -8,6 +8,7 @@ import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.common.LongIdsRequest;
 import org.example.socialmediaspring.dto.common.ReqRes;
 import org.example.socialmediaspring.dto.user.UserRequest;
+import org.example.socialmediaspring.entity.Role;
 import org.example.socialmediaspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -59,9 +60,11 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read')")
     public ResponseEntity findUsersByConds(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
-            @RequestParam(name = "size", defaultValue = "20", required = false) int size
+            @RequestParam(name = "size", defaultValue = "20", required = false) int size,
+            @Valid @RequestParam(name = "role", required = false) Role role,
+            @Valid @RequestParam(name = "email", required = false) String email
     ) {
-        return responseFactory.success(userService.findUsers(page, size));
+        return responseFactory.success(userService.findUsers(page, size, role, email));
     }
 
     @PostMapping("/change_password")

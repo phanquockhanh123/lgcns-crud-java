@@ -2,26 +2,26 @@ package org.example.socialmediaspring.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.socialmediaspring.common.PageNewResponse;
 import org.example.socialmediaspring.common.PageResponse;
+import org.example.socialmediaspring.constant.Common;
 import org.example.socialmediaspring.constant.ErrorCodeConst;
-import org.example.socialmediaspring.dto.book_transactions.BookTransIdsRequest;
-import org.example.socialmediaspring.dto.book_transactions.BookTransSearchRequest;
-import org.example.socialmediaspring.dto.book_transactions.BookTransactionDto;
-import org.example.socialmediaspring.dto.book_transactions.BookTransactionRequest;
+import org.example.socialmediaspring.dto.book.BookResponse;
+import org.example.socialmediaspring.dto.book_transactions.*;
 import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.entity.BookCategory;
 import org.example.socialmediaspring.entity.BookTransaction;
 import org.example.socialmediaspring.entity.User;
 import org.example.socialmediaspring.exception.BizException;
 import org.example.socialmediaspring.repository.BookRepository;
+import org.example.socialmediaspring.repository.BookTransactionCustomRepository;
 import org.example.socialmediaspring.repository.BookTransactionRepository;
 import org.example.socialmediaspring.repository.UserRepository;
 import org.example.socialmediaspring.service.BookTransactionService;
 import org.example.socialmediaspring.utils.DateTimeUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.example.socialmediaspring.utils.JsonUtils;
+import org.springframework.data.domain.*;
+import org.springframework.data.util.Pair;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -32,10 +32,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +44,8 @@ public class BookTransactionServiceImpl implements BookTransactionService {
     private final BookRepository bookRepository;
 
     private final UserRepository userRepository;
+
+    private final BookTransactionCustomRepository bookTransactionCustomRepository;
 
     @Override
     public BookTransaction borrowBook(BookTransactionRequest request, Principal connectedUser) {
@@ -115,23 +114,43 @@ public class BookTransactionServiceImpl implements BookTransactionService {
     }
 
     @Override
-    public PageResponse<BookTransaction> getBookTransByConds(int page, int size, Integer status, List<String> tranIds, List<Integer> userIds) {
+    public PageNewResponse<BookTransactionDto> getBookTransByConds(SearchBookTransactionDto searchReq,  Principal connectedUser) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("created").descending());
+        log.info("start search book transactions. body: {}", JsonUtils.objToString(searchReq));
+        PageRequest pageable = Common.getPageRequest(searchReq.getPage() - 1, searchReq.getLimit(), null);
 
-        Page<BookTransaction> bookTrans = bookTransactionRepository.searchBookTransByConds(pageable, status, tranIds, userIds);
+        Pair<Long, List<BookTransactionDto>> bookTransData = bookTransactionCustomRepository.searchBookTransByConds(searchReq, pageable, connectedUser);
+        Long countBooks = bookTransData.getFirst();
+        List<BookTransactionDto> listBookTrans = bookTransData.getSecond();
 
-        System.out.println("Result books: {}" + bookTrans);
-        List<BookTransaction> booksTransResponse = bookTrans.stream().toList();
-        return new PageResponse<>(
-                booksTransResponse,
-                bookTrans.getNumber(),
-                bookTrans.getSize(),
-                bookTrans.getTotalElements(),
-                bookTrans.getTotalPages(),
-                bookTrans.isFirst(),
-                bookTrans.isLast());
+
+
+        Page<BookTransactionDto> pageBookDto = new PageImpl<>(listBookTrans, pageable, countBooks);
+
+        PageNewResponse<BookTransactionDto> ib = PageNewResponse.<BookTransactionDto>builder()
+                .data(listBookTrans)
+                .build();
+
+        if (Objects.nonNull(searchReq.getGetTotalCount()) && Boolean.TRUE.equals(searchReq.getGetTotalCount())) {
+            ib.setPagination(this.buildPagination(pageBookDto.getSize(), pageBookDto.getTotalPages(),
+                    pageBookDto.getNumber() + 1, pageBookDto.getTotalElements()));
+        }
+
+        log.info("end ...");
+        return ib;
     }
 
+    private Map<String, Long> buildPagination(Integer limit, Integer totalPage, Integer currentPage, Long totalRecord){
+        log.info("start buildPagination ...");
+
+        Map<String, Long> pagination = new HashMap<>();
+        pagination.put("limit", Long.valueOf(limit));
+        pagination.put("total_page", Long.valueOf(totalPage));
+        pagination.put("current_page", Long.valueOf(currentPage));
+        pagination.put("total_record", totalRecord);
+
+        log.info("end buildPagination ...");
+        return pagination;
+    }
 
 }

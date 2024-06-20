@@ -1,5 +1,6 @@
 package org.example.socialmediaspring.dto.book;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,7 +28,9 @@ public class BookResponse {
     private Integer yearOfPublish;
     private Integer quantity;
     private Integer quantityAvail;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date created;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modified;
 
 

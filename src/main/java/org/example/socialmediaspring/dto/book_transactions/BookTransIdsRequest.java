@@ -12,5 +12,5 @@ import java.util.List;
 @Builder
 public class BookTransIdsRequest {
 
-    private List<String> bookTransIds;
+    private String bookTransIds;
 }

@@ -14,6 +14,7 @@ import org.example.socialmediaspring.dto.book.SearchBookRequest;
 import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.book.BookRequest;
 import org.example.socialmediaspring.dto.book.BookResponse;
+import org.example.socialmediaspring.dto.emails.EmailDetails;
 import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.entity.BookCategory;
 import org.example.socialmediaspring.entity.Category;
@@ -112,6 +113,10 @@ public class BookServiceImpl implements BookService {
             }
         });
 
+        // check empty object list cateids
+        if (request.getCateIds() == null || request.getCateIds().isEmpty()) {
+            throw new BizException(ErrorCodeConst.INVALID_INPUT,"No category name has been chosen");
+        }
         // check list category ids exists db
         for (Integer categoryId : request.getCateIds()) {
             Optional<Category> category = categoryRepository.findById(categoryId);
@@ -124,7 +129,8 @@ public class BookServiceImpl implements BookService {
         existsBook.setAuthor(request.getAuthor());
         existsBook.setPrice(request.getPrice());
         existsBook.setDescription(request.getDescription());
-        existsBook.setQuantity(request.getQuantity());
+        existsBook.setQuantity(existsBook.getQuantity() + request.getQuantityBonus());
+        existsBook.setQuantityAvail(existsBook.getQuantityAvail() + request.getQuantityBonus());
         existsBook.setYearOfPublish(request.getYear());
 
         Book savedBook =  bookRepository.save(existsBook);
@@ -160,8 +166,11 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookResponse getBookById(Integer id) {
-        return bookMapper.toBookResponse(
-                bookRepository.findById(id).orElseThrow(() -> new BizException(ErrorCodeConst.INVALID_INPUT, "Book not existed")));
+        if (!bookRepository.existsById(id)) {
+            throw new EntityNotFoundException("Book not existed");
+        }
+
+        return bookRepository.findBooksInfoById(id);
     }
 
     @Override
@@ -251,13 +260,32 @@ public class BookServiceImpl implements BookService {
             book.setDescription("description-bulk-" + maxTitleId + i);
 
             booksEntity.add(book);
+
+
         }
 
         // handle batch data
         int i = 0;
 
+        List<BookCategory> bookCatesEntity = new ArrayList<>();
         for (Book book : booksEntity) {
+
+
             entityManager.persist(book);
+            i++;
+            if (i % BATCH_SIZE == 0) {
+                entityManager.flush();
+                entityManager.clear();
+            }
+            // add book_categories with random cateIds
+            BookCategory bookCategory = new BookCategory();
+            bookCategory.setBookId(book.getId());
+            bookCategory.setCategoryId(cateIds.get(0));
+            bookCatesEntity.add(bookCategory);
+        }
+
+        for(BookCategory bookCategory : bookCatesEntity) {
+            entityManager.persist(bookCategory);
             i++;
             if (i % BATCH_SIZE == 0) {
                 entityManager.flush();

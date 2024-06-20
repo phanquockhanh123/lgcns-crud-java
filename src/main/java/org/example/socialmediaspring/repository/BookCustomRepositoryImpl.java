@@ -31,6 +31,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
 
         StringBuilder sql = this.buildMainQuery();
         sql.append(conditions);
+        sql.append(" GROUP BY b.id ORDER BY b.id DESC ");
         jakarta.persistence.Query query = em.createQuery(sql.toString(), BookResponse.class)
                 .setFirstResult(pageable.getPageSize() * pageable.getPageNumber())
                 .setMaxResults(pageable.getPageSize());
@@ -40,6 +41,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
 
         StringBuilder sqlCount = this.buildCountQuery();
         sqlCount.append(conditions);
+        sqlCount.append(" ORDER BY b.id DESC ");
         jakarta.persistence.Query queryCount = em.createQuery(sqlCount.toString());
         this.setParameters(parameters, queryCount);
         Long count = ((Number) queryCount.getSingleResult()).longValue();
@@ -73,8 +75,10 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
 
     private StringBuilder buildCountQuery() {
         StringBuilder sql = new StringBuilder();
-        sql.append("select count(id) ")
-                .append(" from Book b ");
+        sql.append("select count(*) ")
+                .append(" from Book b ")
+                .append("INNER JOIN BookCategory bc ON b.id = bc.bookId ")
+                .append("INNER JOIN Category c ON c.id = bc.categoryId ");
         return sql;
     }
 
@@ -109,8 +113,6 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
             sql.append("and b.yearOfPublish <= :yearTo ");
             mapParameter.put("yearTo", yearTo);
         }
-
-        sql.append(" GROUP BY b.id ORDER BY b.created DESC");
 
         return Pair.of(sql, mapParameter);
     }

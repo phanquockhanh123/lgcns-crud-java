@@ -8,6 +8,7 @@ import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.book.BookRequest;
 import org.example.socialmediaspring.service.BookService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,6 +72,5 @@ public class BookController {
 
         return responseFactory.success(bookService.deleteBooksByIds(ids));
     }
-
 
 }

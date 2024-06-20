@@ -1,5 +1,6 @@
 package org.example.socialmediaspring.controller;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,4 +11,6 @@ public class HomeController {
     public String hello() {
         return "Hello spring boot";
     }
+
+
 }

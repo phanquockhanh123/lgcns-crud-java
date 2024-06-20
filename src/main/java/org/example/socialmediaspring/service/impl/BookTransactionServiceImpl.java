@@ -8,6 +8,7 @@ import org.example.socialmediaspring.constant.Common;
 import org.example.socialmediaspring.constant.ErrorCodeConst;
 import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.dto.book_transactions.*;
+import org.example.socialmediaspring.dto.emails.EmailDetails;
 import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.entity.BookCategory;
 import org.example.socialmediaspring.entity.BookTransaction;
@@ -18,8 +19,11 @@ import org.example.socialmediaspring.repository.BookTransactionCustomRepository;
 import org.example.socialmediaspring.repository.BookTransactionRepository;
 import org.example.socialmediaspring.repository.UserRepository;
 import org.example.socialmediaspring.service.BookTransactionService;
+import org.example.socialmediaspring.service.EmailService;
 import org.example.socialmediaspring.utils.DateTimeUtils;
 import org.example.socialmediaspring.utils.JsonUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.*;
 import org.springframework.data.util.Pair;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,6 +51,10 @@ public class BookTransactionServiceImpl implements BookTransactionService {
 
     private final BookTransactionCustomRepository bookTransactionCustomRepository;
 
+    @Autowired
+    EmailService emailService;
+
+
     @Override
     public BookTransaction borrowBook(BookTransactionRequest request, Principal connectedUser) {
 
@@ -67,18 +75,20 @@ public class BookTransactionServiceImpl implements BookTransactionService {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "So luong sach khong du cung cap");
         }
         // check startDate less than endDate
-        if (request.getStartDate() > request.getEndDate()) {
+        Long  startDate = DateTimeUtils.convertToTimestamp(request.getStartDate());
+        Long  endDate = DateTimeUtils.convertToTimestamp(request.getEndDate());
+        if (startDate > endDate) {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "Thoi gian khong hop le");
         }
         BookTransaction bt = new BookTransaction();
 
-        Long durationInHours = (request.getEndDate() - request.getStartDate()) /  86400000;
+        Long durationInHours = (endDate - startDate) /  86400000;
 
         bt.setBookId(request.getBookId());
         bt.setUserId(Math.toIntExact(userInfo.getId()));
         bt.setQuantity(request.getQuantity());
-        bt.setStartDate(DateTimeUtils.convertTimestampToLocalDateTime(request.getStartDate()));
-        bt.setEndDate(DateTimeUtils.convertTimestampToLocalDateTime(request.getEndDate()));
+        bt.setStartDate(request.getStartDate());
+        bt.setEndDate(request.getEndDate());
         bt.setAmount((int) (durationInHours * book.getPrice() * request.getQuantity()));
         bt.setBonus(0);
         bt.setStatus(0);
@@ -93,23 +103,18 @@ public class BookTransactionServiceImpl implements BookTransactionService {
     }
 
     @Override
-    public BookTransaction returnBook(BookTransIdsRequest request) {
+    public BookTransaction returnBook(String transId) {
 
         //  check status == 2 => user have to pay bonus and amount
         // set status = 1,return_date
 
-        List<BookTransaction> bookTransactions = bookTransactionRepository.findByBookTransIds(request.getBookTransIds());
+        BookTransaction bookTransactions = bookTransactionRepository.findByBookTransIds(transId);
 
-        if (bookTransactions.isEmpty()) {
+        if (bookTransactions == null) {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "Khong co giao dich can thanh toan");
         }
 
-        List<UUID> bookTransIds = new ArrayList<>();
-        for (BookTransaction bookTransaction : bookTransactions) {
-            bookTransIds.add(bookTransaction.getTransactionId());
-        }
-
-        bookTransactionRepository.updateTransactionStatus(bookTransIds);
+        bookTransactionRepository.updateTransactionStatus(bookTransactions.getTransactionId());
         return null;
     }
 
@@ -138,6 +143,25 @@ public class BookTransactionServiceImpl implements BookTransactionService {
 
         log.info("end ...");
         return ib;
+    }
+
+    @Override
+    public void sendMaiNoticeOTBorrowBook() {
+        // check list book transaction about 1 days loan borrow expired with status = 0, now() > end_date  - 1days
+        LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
+        List<NoticeMailExpiredTimeDto> users = bookTransactionRepository.getInfoUserExpiredTime(yesterday);
+
+        // send mail to alert user
+        for (NoticeMailExpiredTimeDto user : users) {
+            EmailDetails emailDetails = EmailDetails.builder()
+                    .recipient(user.getEmail())
+                    .subject("LOAN BORROW EXPIRED")
+                    .messageBody("Time borrow exipred:")
+                    .build();
+
+            emailService.sendEmailAlert(emailDetails);
+        }
+
     }
 
     private Map<String, Long> buildPagination(Integer limit, Integer totalPage, Integer currentPage, Long totalRecord){

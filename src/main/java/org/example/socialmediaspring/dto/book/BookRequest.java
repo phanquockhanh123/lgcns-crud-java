@@ -1,6 +1,7 @@
 package org.example.socialmediaspring.dto.book;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,5 +37,7 @@ public class BookRequest{
         private Integer quantity;
 
         private Integer quantityAvail;
+
+        private Integer quantityBonus;
 
 }

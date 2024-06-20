@@ -11,6 +11,7 @@ import org.example.socialmediaspring.dto.book_transactions.BookTransactionReques
 import org.example.socialmediaspring.dto.book_transactions.SearchBookTransactionDto;
 import org.example.socialmediaspring.service.BookTransactionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,5 +46,21 @@ public class BookTransactionController {
             Principal connectedUser
     ) {
         return responseFactory.success(bookTransactionService.getBookTransByConds(new SearchBookTransactionDto(limit, page, getTotalCount, userId, status), connectedUser));
+    }
+
+    @Scheduled(cron = "0 6 * * *")
+    @GetMapping("/notice")
+    public ResponseEntity sendNoticedUserOvertimeBorrowBook() {
+        bookTransactionService.sendMaiNoticeOTBorrowBook();
+        return responseFactory.success("Send email notice book transaction expired time");
+    }
+
+    @PostMapping("/return-book/{transId}")
+    @PreAuthorize("hasAnyAuthority('user:update')")
+    public ResponseEntity returnBook(
+            @Valid @PathVariable String transId
+    ) {
+        bookTransactionService.returnBook(transId);
+        return responseFactory.success("Return book successfully!");
     }
 }

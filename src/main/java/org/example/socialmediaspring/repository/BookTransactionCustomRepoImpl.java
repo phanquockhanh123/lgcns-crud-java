@@ -87,8 +87,9 @@ public class BookTransactionCustomRepoImpl implements  BookTransactionCustomRepo
 
     private StringBuilder buildCountQuery() {
         StringBuilder sql = new StringBuilder();
-        sql.append("select count(id) ")
-                .append(" from BookTransaction bt ");
+        sql.append("select count(*) ")
+                .append("FROM BookTransaction bt INNER JOIN Book b ON bt.bookId = b.id ")
+                .append("INNER JOIN User u ON bt.userId = u.id ");
         return sql;
     }
 
@@ -98,7 +99,7 @@ public class BookTransactionCustomRepoImpl implements  BookTransactionCustomRepo
 
         sql.append(" where 1 = 1 ");
 
-        if (Objects.nonNull(searchReq.getUserId())) {
+        if (Objects.nonNull(searchReq.getUserId()) && searchReq.getUserId()) {
             UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             User user = userRepository.findUsersByUsername(currentUser.getUsername());
 
@@ -112,7 +113,7 @@ public class BookTransactionCustomRepoImpl implements  BookTransactionCustomRepo
             mapParameter.put("status", status);
         }
 
-        sql.append("ORDER BY bt.created DESC ");
+        sql.append("ORDER BY bt.id DESC ");
 
         return Pair.of(sql, mapParameter);
     }

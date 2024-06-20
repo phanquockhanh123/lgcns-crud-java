@@ -12,8 +12,11 @@ public interface BookTransactionService {
 
     BookTransaction borrowBook(BookTransactionRequest request, Principal connectedUser);
 
-    BookTransaction returnBook(BookTransIdsRequest request);
+    BookTransaction returnBook(String transId);
 
     PageNewResponse<BookTransactionDto> getBookTransByConds(SearchBookTransactionDto request, Principal connectedUser);
+
+
+    void sendMaiNoticeOTBorrowBook();
 
 }

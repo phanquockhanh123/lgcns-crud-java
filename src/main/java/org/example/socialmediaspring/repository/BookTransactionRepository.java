@@ -22,13 +22,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface BookTransactionRepository extends JpaRepository<BookTransaction, Integer> {
-    @Query(value = "SELECT * FROM book_transactions bt where bt.book_transaction_id = :transId and bt.status = 0", nativeQuery = true)
-    BookTransaction findByBookTransIds(String transId);
+    @Query(value = "SELECT bt FROM BookTransaction bt where bt.transactionId = :transId and bt.status = 0")
+    Optional<BookTransaction> findByBookTransIds(UUID transId);
 
-    @Modifying
-    @Transactional
-    @Query("UPDATE BookTransaction bt SET bt.status = 1 WHERE bt.status = 0 AND bt.transactionId = :transactionId  ")
-    void updateTransactionStatus(UUID transactionId);
+//    @Modifying
+//    @Transactional
+//    @Query("UPDATE BookTransaction bt SET bt.status = 1 WHERE bt.status = 0 AND bt.transactionId = :transactionId  ")
+//    void updateTransactionStatus(UUID transactionId);
 
 //    @Query(value = "SELECT new org.example.socialmediaspring.dto.book_transactions.BookTransactionDto(bt.id, b.title, u.email, u.phone, bt.transactionId, bt.status, bt.quantity, bt.amount, bt.bonus, bt.startDate, bt.endDate, bt.returnDate) " +
 //            " FROM BookTransaction bt " +

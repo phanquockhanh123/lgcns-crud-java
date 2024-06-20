@@ -103,19 +103,31 @@ public class BookTransactionServiceImpl implements BookTransactionService {
     }
 
     @Override
-    public BookTransaction returnBook(String transId) {
+    public BookTransactionDetailDto returnBook(Integer id) {
 
         //  check status == 2 => user have to pay bonus and amount
         // set status = 1,return_date
 
-        BookTransaction bookTransactions = bookTransactionRepository.findByBookTransIds(transId);
+        BookTransaction existsBookTrans = bookTransactionRepository.findById(id)
+                .orElseThrow(() -> new BizException(ErrorCodeConst.INVALID_INPUT, "Book  not found with id " + id));
 
-        if (bookTransactions == null) {
-            throw new BizException(ErrorCodeConst.INVALID_INPUT, "Khong co giao dich can thanh toan");
-        }
+        existsBookTrans.setStatus(1);
+        existsBookTrans.setReturnDate(LocalDateTime.now());
 
-        bookTransactionRepository.updateTransactionStatus(bookTransactions.getTransactionId());
-        return null;
+        BookTransaction bk = bookTransactionRepository.save(existsBookTrans);
+
+        return BookTransactionDetailDto.builder()
+                .bookId(bk.getBookId())
+                .transactionId(bk.getTransactionId())
+                .userId(bk.getUserId())
+                .startDate(bk.getStartDate())
+                .endDate(bk.getEndDate())
+                .returnDate(bk.getReturnDate())
+                .bonus(bk.getBonus())
+                .amount(bk.getAmount())
+                .status(bk.getStatus())
+                .quantity(bk.getQuantity())
+                .build();
     }
 
     @Override
@@ -151,6 +163,7 @@ public class BookTransactionServiceImpl implements BookTransactionService {
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
         List<NoticeMailExpiredTimeDto> users = bookTransactionRepository.getInfoUserExpiredTime(yesterday);
 
+        log.info("get start send email for list user {}", JsonUtils.objToString(users));
         // send mail to alert user
         for (NoticeMailExpiredTimeDto user : users) {
             EmailDetails emailDetails = EmailDetails.builder()

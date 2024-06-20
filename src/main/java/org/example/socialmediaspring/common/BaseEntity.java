@@ -27,11 +27,11 @@ public class BaseEntity {
     private Integer id;
 
     @Column(name = "created")
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date created;
 
     @Column(name = "modified")
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modified;
 
     @PrePersist

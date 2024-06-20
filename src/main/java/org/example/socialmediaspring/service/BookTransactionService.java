@@ -7,12 +7,13 @@ import org.example.socialmediaspring.entity.BookTransaction;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 public interface BookTransactionService {
 
     BookTransaction borrowBook(BookTransactionRequest request, Principal connectedUser);
 
-    BookTransaction returnBook(String transId);
+    BookTransactionDetailDto returnBook(Integer id);
 
     PageNewResponse<BookTransactionDto> getBookTransByConds(SearchBookTransactionDto request, Principal connectedUser);
 

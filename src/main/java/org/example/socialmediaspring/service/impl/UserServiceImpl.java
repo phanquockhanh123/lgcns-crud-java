@@ -151,7 +151,7 @@ public class UserServiceImpl implements UserService {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "Wrong password");
         }
         // check if the two new passwords are the same
-        if (!request.getNewPass().equals(currentUser.getPassword())) {
+        if (request.getNewPass().equals(currentUser.getPassword())) {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "Password no change");
         }
 

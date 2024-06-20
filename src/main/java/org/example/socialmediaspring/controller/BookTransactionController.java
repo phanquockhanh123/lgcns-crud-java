@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/admin/book_transactions")
@@ -55,12 +56,11 @@ public class BookTransactionController {
         return responseFactory.success("Send email notice book transaction expired time");
     }
 
-    @PostMapping("/return-book/{transId}")
+    @PostMapping("/return-book/{id}")
     @PreAuthorize("hasAnyAuthority('user:update')")
     public ResponseEntity returnBook(
-            @Valid @PathVariable String transId
+            @Valid @PathVariable Integer id
     ) {
-        bookTransactionService.returnBook(transId);
-        return responseFactory.success("Return book successfully!");
+        return responseFactory.success(bookTransactionService.returnBook(id));
     }
 }

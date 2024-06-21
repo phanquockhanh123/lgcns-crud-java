@@ -56,6 +56,14 @@ public class BookTransactionController {
         return responseFactory.success("Send email notice book transaction expired time");
     }
 
+    @GetMapping("/send-mail-notice/{id}")
+    public ResponseEntity sendMailNotice(
+            @Valid @PathVariable Integer id
+    ) {
+        bookTransactionService.sendMailNoticeSingle(id);
+        return responseFactory.success("Send email notice book transaction expired time");
+    }
+
     @PostMapping("/return-book/{id}")
     @PreAuthorize("hasAnyAuthority('user:update')")
     public ResponseEntity returnBook(

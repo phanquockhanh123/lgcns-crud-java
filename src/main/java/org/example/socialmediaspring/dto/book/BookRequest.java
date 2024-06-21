@@ -38,6 +38,4 @@ public class BookRequest{
 
         private Integer quantityAvail;
 
-        private Integer quantityBonus;
-
 }

@@ -17,7 +17,8 @@ public interface BookTransactionService {
 
     PageNewResponse<BookTransactionDto> getBookTransByConds(SearchBookTransactionDto request, Principal connectedUser);
 
-
     void sendMaiNoticeOTBorrowBook();
+
+    void sendMailNoticeSingle(Integer id);
 
 }

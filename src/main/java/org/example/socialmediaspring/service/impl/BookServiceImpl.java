@@ -129,8 +129,8 @@ public class BookServiceImpl implements BookService {
         existsBook.setAuthor(request.getAuthor());
         existsBook.setPrice(request.getPrice());
         existsBook.setDescription(request.getDescription());
-        existsBook.setQuantity(existsBook.getQuantity() + request.getQuantityBonus());
-        existsBook.setQuantityAvail(existsBook.getQuantityAvail() + request.getQuantityBonus());
+        existsBook.setQuantity(existsBook.getQuantity() + request.getQuantity());
+        existsBook.setQuantityAvail(existsBook.getQuantityAvail() + request.getQuantity());
         existsBook.setYearOfPublish(request.getYear());
 
         Book savedBook =  bookRepository.save(existsBook);

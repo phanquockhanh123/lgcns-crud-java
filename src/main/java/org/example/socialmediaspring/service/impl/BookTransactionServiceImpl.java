@@ -116,6 +116,14 @@ public class BookTransactionServiceImpl implements BookTransactionService {
 
         BookTransaction bk = bookTransactionRepository.save(existsBookTrans);
 
+        // return quantity available table books
+        Book book = bookRepository.findBookById(bk.getBookId());
+        System.out.println("quantity return" + existsBookTrans.getQuantity());
+        System.out.println("quantity avail" + book.getQuantityAvail());
+        book.setQuantityAvail(book.getQuantityAvail() + existsBookTrans.getQuantity());
+
+        bookRepository.save(book);
+
         return BookTransactionDetailDto.builder()
                 .bookId(bk.getBookId())
                 .transactionId(bk.getTransactionId())
@@ -161,21 +169,44 @@ public class BookTransactionServiceImpl implements BookTransactionService {
     public void sendMaiNoticeOTBorrowBook() {
         // check list book transaction about 1 days loan borrow expired with status = 0, now() > end_date  - 1days
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
-        List<NoticeMailExpiredTimeDto> users = bookTransactionRepository.getInfoUserExpiredTime(yesterday);
+        List<NoticeMailExpiredTimeDto> userInfos = bookTransactionRepository.getInfoUserExpiredTime(yesterday);
 
-        log.info("get start send email for list user {}", JsonUtils.objToString(users));
+        log.info("get start send email for list user {}", JsonUtils.objToString(userInfos));
         // send mail to alert user
-        for (NoticeMailExpiredTimeDto user : users) {
-            EmailDetails emailDetails = EmailDetails.builder()
-                    .recipient(user.getEmail())
-                    .subject("LOAN BORROW EXPIRED")
-                    .messageBody("Time borrow exipred:")
-                    .build();
-
-            emailService.sendEmailAlert(emailDetails);
+        for (NoticeMailExpiredTimeDto user : userInfos) {
+            this.sendMailNoticeCommon(user);
         }
 
     }
+
+    @Override
+    public void sendMailNoticeSingle(Integer id) {
+        NoticeMailExpiredTimeDto userInfo = bookTransactionRepository.getInfoTransById(id);
+        log.info("get start send email for list user {}", JsonUtils.objToString(userInfo));
+
+        this.sendMailNoticeCommon(userInfo);
+    }
+
+    private void sendMailNoticeCommon(NoticeMailExpiredTimeDto user) {
+        EmailDetails emailDetails = EmailDetails.builder()
+                .recipient(user.getEmail())
+                .subject("LOAN BORROW EXPIRED")
+                .messageBody("LOAN EXPIRED TIME. Your account details:\n"
+                        + "Account name: " + user.getFirstName() + " " + user.getLastName()
+                        + "\n Email: " + user.getEmail() + "\n Phone: " + user.getPhone()
+                        + "\n Your books info:\n"
+                        + "\n Book isbn: " + user.getBookIsbn()
+                        + "\n Book title: " + user.getBookTitle()
+                        + "\n Book author: " + user.getBookAuthor()
+                        + "\n Book price: " + user.getBookPrice()
+                        + "\n Your books borrow :\n"
+                        + "\n Quantity: " + user.getQuantity()
+                        + "\n Amount: " + user.getAmount()
+                )
+                .build();
+        emailService.sendEmailAlert(emailDetails);
+    }
+
 
     private Map<String, Long> buildPagination(Integer limit, Integer totalPage, Integer currentPage, Long totalRecord){
         log.info("start buildPagination ...");

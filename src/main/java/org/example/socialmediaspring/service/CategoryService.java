@@ -4,6 +4,8 @@ import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.dto.category.CategoryRequest;
 import org.example.socialmediaspring.entity.Category;
 
+import java.util.List;
+
 public interface CategoryService {
     Category createCategory(CategoryRequest category);
 
@@ -14,4 +16,5 @@ public interface CategoryService {
     PageResponse<Category> getAllCategories(int page, int size);
 
     Category getCategoryById(Integer id);
+
 }

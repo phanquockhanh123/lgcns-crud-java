@@ -8,6 +8,8 @@ import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.book.BookRequest;
 import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.entity.Book;
+import org.example.socialmediaspring.entity.BookCategory;
+import org.example.socialmediaspring.entity.Category;
 
 import java.util.List;
 
@@ -25,6 +27,8 @@ public interface BookService {
     String deleteBooksByIds(IdsRequest id);
 
     String bulkBookService();
+
+    List<Category> getCategoriesByBookId(Integer id);
 
 
 }

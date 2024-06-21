@@ -73,4 +73,10 @@ public class BookController {
         return responseFactory.success(bookService.deleteBooksByIds(ids));
     }
 
+    @GetMapping("/cates/{id}")
+    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read')")
+    public ResponseEntity getCategoriesByBookId(@Valid @PathVariable Integer id) {
+        return responseFactory.success(bookService.getCategoriesByBookId(id));
+    }
+
 }

@@ -239,25 +239,24 @@ public class BookServiceImpl implements BookService {
         // get list category id
         List<Integer> cateIds = categoryRepository.findIdsCategory();
 
+
         if (cateIds.isEmpty()) {
             throw new BizException(ErrorCodeConst.VALIDATE_VIOLATION, "Category id null, dont create book");
         }
 
-        Integer maxTitleNumber = bookRepository.findMaxTitleNumber();
+        int maxTitleNumber = bookRepository.findMaxTitleNumber();
 
-        int maxTitleId = maxTitleNumber != null ? maxTitleNumber.intValue() : 0;
-        System.out.println(maxTitleId + 123);
         for (int i = 0; i < 10000; i++) {
             Book book = new Book();
 
-            book.setTitle("title-book-bulk-" + (maxTitleId + i));
-            book.setAuthor("author-book-bulk-" + (maxTitleId + i));
+            book.setTitle("title-book-bulk-" + (maxTitleNumber + i));
+            book.setAuthor("author-book-bulk-" + (maxTitleNumber + i));
             book.setPrice((long) random.nextInt(1000));
             book.setQuantity(random.nextInt(100));
             book.setIsbn(isbnGenerator.generateISBN());
             book.setQuantityAvail(20);
             book.setYearOfPublish(getRandomYear());
-            book.setDescription("description-bulk-" + maxTitleId + i);
+            book.setDescription("description-bulk-" + (maxTitleNumber + i));
 
             booksEntity.add(book);
 
@@ -269,8 +268,7 @@ public class BookServiceImpl implements BookService {
 
         List<BookCategory> bookCatesEntity = new ArrayList<>();
         for (Book book : booksEntity) {
-
-
+            int randomCateId = random.nextInt(cateIds.size());
             entityManager.persist(book);
             i++;
             if (i % BATCH_SIZE == 0) {
@@ -280,7 +278,7 @@ public class BookServiceImpl implements BookService {
             // add book_categories with random cateIds
             BookCategory bookCategory = new BookCategory();
             bookCategory.setBookId(book.getId());
-            bookCategory.setCategoryId(cateIds.get(0));
+            bookCategory.setCategoryId(cateIds.get(randomCateId));
             bookCatesEntity.add(bookCategory);
         }
 
@@ -317,6 +315,17 @@ public class BookServiceImpl implements BookService {
 
         log.info("end buildPagination ...");
         return pagination;
+    }
+
+    @Override
+    public List<Category> getCategoriesByBookId(Integer id) {
+
+        Book existsBook = bookRepository.findById(id)
+                .orElseThrow(() -> new BizException(ErrorCodeConst.INVALID_INPUT, "Book not found with id " + id));
+
+        List<Category> cates = bookRepository.getCatesByBookId(id);
+
+        return cates;
     }
 
 }

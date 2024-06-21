@@ -114,6 +114,19 @@ public class BookTransactionServiceImpl implements BookTransactionService {
         existsBookTrans.setStatus(1);
         existsBookTrans.setReturnDate(LocalDateTime.now());
 
+        // check returnDate > endDate
+        if (existsBookTrans.getReturnDate().isAfter(existsBookTrans.getEndDate())) {
+            Long  endDate = DateTimeUtils.convertToTimestamp(existsBookTrans.getEndDate());
+            Long  returnDate = DateTimeUtils.convertToTimestamp(existsBookTrans.getReturnDate());
+
+            Book book = bookRepository.findBookById(existsBookTrans.getBookId());
+
+            Long expiredDay = (returnDate - endDate) /  86400000;
+            System.out.println("Expired day: " + expiredDay);
+
+            existsBookTrans.setBonus((int) (expiredDay * existsBookTrans.getQuantity() * book.getPrice()));
+        }
+
         BookTransaction bk = bookTransactionRepository.save(existsBookTrans);
 
         // return quantity available table books

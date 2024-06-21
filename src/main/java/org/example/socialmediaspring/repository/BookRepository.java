@@ -3,6 +3,7 @@ package org.example.socialmediaspring.repository;
 import org.example.socialmediaspring.dto.book.BookCategoryDto;
 import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.entity.Book;
+import org.example.socialmediaspring.entity.Category;
 import org.example.socialmediaspring.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -46,11 +47,12 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
         " WHERE (:bookId is null OR b.id = :bookId) ")
     BookResponse findBooksInfoById(Integer bookId);
 
-    @Query("SELECT MAX(CAST(SUBSTRING(b.title, 16) AS int)) FROM Book b WHERE b.title LIKE 'title-book-bulk-%'")
-    Integer findMaxTitleNumber();
+    @Query("SELECT MAX(CAST(SUBSTRING(b.title, 17) AS int)) FROM Book b WHERE b.title LIKE 'title-book-bulk-%'")
+    int findMaxTitleNumber();
 
     @Query(value = "SELECT * FROM books b where b.id = :bookId ", nativeQuery = true)
     Book findBookById(Integer bookId);
 
-
+    @Query(value = "SELECT c FROM Category c INNER JOIN BookCategory bc on c.id = bc.categoryId INNER JOIN Book b ON bc.bookId = b.id where b.id = :id ")
+    List<Category> getCatesByBookId(Integer id);
 }

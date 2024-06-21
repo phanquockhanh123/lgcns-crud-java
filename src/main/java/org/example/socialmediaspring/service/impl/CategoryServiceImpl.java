@@ -9,6 +9,7 @@ import org.example.socialmediaspring.dto.category.CategoryRequest;
 import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.entity.Category;
 import org.example.socialmediaspring.exception.BizException;
+import org.example.socialmediaspring.repository.BookRepository;
 import org.example.socialmediaspring.repository.CategoryRepository;
 import org.example.socialmediaspring.service.CategoryService;
 import org.modelmapper.ModelMapper;
@@ -27,6 +28,8 @@ public class CategoryServiceImpl implements CategoryService {
     private  final CategoryRepository categoryRepository;
 
     private final ModelMapper mapper;
+
+    private  final BookRepository bookRepository;
 
 
     @Override
@@ -97,4 +100,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         return category;
     }
+
+
 }

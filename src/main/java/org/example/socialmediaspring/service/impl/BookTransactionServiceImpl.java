@@ -195,7 +195,7 @@ public class BookTransactionServiceImpl implements BookTransactionService {
     @Override
     public void sendMailNoticeSingle(Integer id) {
         NoticeMailExpiredTimeDto userInfo = bookTransactionRepository.getInfoTransById(id);
-        log.info("get start send email for list user {}", JsonUtils.objToString(userInfo));
+        log.info("Get start send email for list user {}", JsonUtils.objToString(userInfo));
 
         this.sendMailNoticeCommon(userInfo);
     }
@@ -207,12 +207,12 @@ public class BookTransactionServiceImpl implements BookTransactionService {
                 .messageBody("LOAN EXPIRED TIME. Your account details:\n"
                         + "Account name: " + user.getFirstName() + " " + user.getLastName()
                         + "\n Email: " + user.getEmail() + "\n Phone: " + user.getPhone()
-                        + "\n Your books info:\n"
+                        + "\n\n Your books info:"
                         + "\n Book isbn: " + user.getBookIsbn()
                         + "\n Book title: " + user.getBookTitle()
                         + "\n Book author: " + user.getBookAuthor()
                         + "\n Book price: " + user.getBookPrice()
-                        + "\n Your books borrow :\n"
+                        + "\n\n Your books borrow :"
                         + "\n Quantity: " + user.getQuantity()
                         + "\n Amount: " + user.getAmount()
                 )

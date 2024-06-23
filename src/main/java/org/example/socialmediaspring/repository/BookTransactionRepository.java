@@ -59,7 +59,7 @@ public interface BookTransactionRepository extends JpaRepository<BookTransaction
             " ON bt.userId = u.id " +
             " INNER JOIN Book b " +
             " ON bt.bookId = b.id " +
-            " WHERE bt.status = 0 AND bt.endDate >= :yesterday ")
+            " WHERE bt.status = 0 AND bt.endDate <= :yesterday ")
     List<NoticeMailExpiredTimeDto> getInfoUserExpiredTime(LocalDateTime yesterday);
 
     @Query(value = "SELECT new org.example.socialmediaspring.dto.book_transactions.NoticeMailExpiredTimeDto(" +

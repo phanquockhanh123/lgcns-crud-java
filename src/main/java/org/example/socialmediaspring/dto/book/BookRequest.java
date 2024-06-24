@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -37,5 +38,8 @@ public class BookRequest{
         private Integer quantity;
 
         private Integer quantityAvail;
+
+        private  MultipartFile filePath;
+
 
 }

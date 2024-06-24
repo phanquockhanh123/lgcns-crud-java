@@ -22,12 +22,16 @@ import org.example.socialmediaspring.exception.BizException;
 import org.example.socialmediaspring.mapper.BookMapper;
 import org.example.socialmediaspring.repository.*;
 import org.example.socialmediaspring.service.BookService;
+import org.example.socialmediaspring.utils.FileUploadUtil;
 import org.example.socialmediaspring.utils.JsonUtils;
 import org.springframework.data.domain.*;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Year;
 import java.util.*;
 
@@ -54,7 +58,7 @@ public class BookServiceImpl implements BookService {
     private static final int BATCH_SIZE = 1000;
 
     @Override
-    public BookCategoryDto saveBook(BookRequest bookRequest) {
+    public BookCategoryDto saveBook(BookRequest bookRequest) throws IOException {
 
         if (bookRepository.existsByTitle(bookRequest.getTitle())) {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "Book title existed");
@@ -68,12 +72,17 @@ public class BookServiceImpl implements BookService {
             }
         }
 
+        String fileName = StringUtils.cleanPath(bookRequest.getFilePath().getOriginalFilename());
         Book book = bookMapper.toBook(bookRequest);
 
         book.setIsbn(isbnGenerator.generateISBN());
         book.setQuantityAvail(book.getQuantity());
-
+        book.setFilePath(fileName);
         Book savedBook =  bookRepository.save(book);
+
+        String uploadDir = "src/main/resources/static/public/book-images/" + book.getId();
+
+        FileUploadUtil.saveFile(uploadDir, fileName, bookRequest.getFilePath());
 
         // save book_categories record
         List<BookCategory> bookCategoriesEntity = new ArrayList<>();
@@ -102,7 +111,7 @@ public class BookServiceImpl implements BookService {
                 .build();
     }
     @Override
-    public BookCategoryDto updateBook(Integer id, BookRequest request) {
+    public BookCategoryDto updateBook(Integer id, BookRequest request) throws IOException {
         Book existsBook = bookRepository.findById(id)
                 .orElseThrow(() -> new BizException(ErrorCodeConst.INVALID_INPUT, "Book not found with id " + id));
 
@@ -124,6 +133,8 @@ public class BookServiceImpl implements BookService {
                 throw new BizException(ErrorCodeConst.VALIDATE_VIOLATION, "Category id " + categoryId + " does not exist.");
             }
         }
+        String fileName = StringUtils.cleanPath(request.getFilePath().getOriginalFilename());
+
 
         existsBook.setTitle(request.getTitle());
         existsBook.setAuthor(request.getAuthor());
@@ -134,6 +145,10 @@ public class BookServiceImpl implements BookService {
         existsBook.setYearOfPublish(request.getYear());
 
         Book savedBook =  bookRepository.save(existsBook);
+
+        String uploadDir = "src/main/resources/static/public/book-images/" + existsBook.getId();
+
+        FileUploadUtil.saveFile(uploadDir, fileName, request.getFilePath());
 
         // delete and create new book_categories
         List<BookCategory> bookCategoriesEntity = new ArrayList<>();

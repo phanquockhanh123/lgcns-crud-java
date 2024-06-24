@@ -5,10 +5,13 @@ import org.example.socialmediaspring.dto.book.BookRequest;
 import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.entity.BookCategory;
+import org.example.socialmediaspring.utils.ImageUtils;
 import org.springframework.stereotype.Service;
 
 @Service
 public class BookMapper {
+    private final String FOLDER_PATH="/Pictures/";
+
     public Book toBook(BookRequest request) {
         return Book.builder()
                 .title(request.getTitle())
@@ -19,6 +22,7 @@ public class BookMapper {
                 .yearOfPublish(request.getYear())
                 .quantity(request.getQuantity())
                 .quantityAvail(request.getQuantityAvail())
+                .filePath(null)
                 .build();
     }
 

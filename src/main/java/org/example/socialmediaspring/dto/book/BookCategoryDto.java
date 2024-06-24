@@ -1,5 +1,6 @@
 package org.example.socialmediaspring.dto.book;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -22,6 +23,8 @@ public class BookCategoryDto {
     private Integer quantity;
     private Integer quantityAvail;
     private Integer yearOfPublish;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date created;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modified;
 }

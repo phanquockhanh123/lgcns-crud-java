@@ -2,6 +2,7 @@ package org.example.socialmediaspring.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.example.socialmediaspring.common.BaseEntity;
@@ -22,4 +23,6 @@ public class Book extends BaseEntity {
     private Integer yearOfPublish;
     private Integer quantity = 0;
     private Integer quantityAvail = 0;
+    private String filePath;
+
 }

@@ -11,7 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -26,8 +28,8 @@ public class BookController {
     @PostMapping
     @PreAuthorize("hasAnyAuthority('admin:create', 'manager:create')")
     public ResponseEntity saveBook(
-            @Valid @RequestBody BookRequest request
-    ) {
+            @Valid @ModelAttribute BookRequest request
+            ) throws IOException {
         return responseFactory.success(bookService.saveBook(request));
     }
 
@@ -35,7 +37,7 @@ public class BookController {
     @PreAuthorize("hasAnyAuthority('admin:update', 'manager:update')")
     public ResponseEntity updateBook(
             @PathVariable Integer id,
-            @Valid @RequestBody  BookRequest request) {
+            @Valid @ModelAttribute  BookRequest request) throws  IOException {
         return responseFactory.success(bookService.updateBook(id, request));
     }
 

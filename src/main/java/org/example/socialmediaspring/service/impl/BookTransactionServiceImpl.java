@@ -162,7 +162,6 @@ public class BookTransactionServiceImpl implements BookTransactionService {
         List<BookTransactionDto> listBookTrans = bookTransData.getSecond();
 
 
-
         Page<BookTransactionDto> pageBookDto = new PageImpl<>(listBookTrans, pageable, countBooks);
 
         PageNewResponse<BookTransactionDto> ib = PageNewResponse.<BookTransactionDto>builder()
@@ -214,6 +213,8 @@ public class BookTransactionServiceImpl implements BookTransactionService {
                         + "\n Book price: " + user.getBookPrice()
                         + "\n\n Your books borrow :"
                         + "\n Quantity: " + user.getQuantity()
+                        + "\n Start date: " + user.getStartDate()
+                        + "\n End date: " + user.getEndDate()
                         + "\n Amount: " + user.getAmount()
                 )
                 .build();

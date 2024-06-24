@@ -39,7 +39,7 @@ public class BookRequest{
 
         private Integer quantityAvail;
 
-        private  MultipartFile filePath;
+       //private MultipartFile filePath;
 
 
 }

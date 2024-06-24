@@ -3,6 +3,7 @@ package org.example.socialmediaspring.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.socialmediaspring.common.ResponseFactory;
+import org.example.socialmediaspring.dto.book.CUBookRequest;
 import org.example.socialmediaspring.dto.book.SearchBookRequest;
 import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.book.BookRequest;
@@ -28,17 +29,31 @@ public class BookController {
     @PostMapping
     @PreAuthorize("hasAnyAuthority('admin:create', 'manager:create')")
     public ResponseEntity saveBook(
-            @Valid @ModelAttribute BookRequest request
+             @RequestPart("title") String title,
+             @RequestPart("author") String author,
+             @RequestPart("quantity") Integer quantity,
+             @RequestPart("price") Long price,
+             @RequestPart("year") Integer year,
+             @RequestPart("cateIds") List<Integer> cateIds,
+             @RequestPart("description") String description,
+             @RequestPart("filePath") MultipartFile file
             ) throws IOException {
-        return responseFactory.success(bookService.saveBook(request));
+        return responseFactory.success(bookService.saveBook(new CUBookRequest(title, author, quantity, price, year, cateIds, description, file)));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('admin:update', 'manager:update')")
     public ResponseEntity updateBook(
             @PathVariable Integer id,
-            @Valid @ModelAttribute  BookRequest request) throws  IOException {
-        return responseFactory.success(bookService.updateBook(id, request));
+            @RequestPart("title") String title,
+            @RequestPart("author") String author,
+            @RequestPart("quantity") Integer quantity,
+            @RequestPart("price") Long price,
+            @RequestPart("year") Integer year,
+            @RequestPart("cateIds") List<Integer> cateIds,
+            @RequestPart("description") String description,
+            @RequestPart("filePath") MultipartFile file) throws  IOException {
+        return responseFactory.success(bookService.updateBook(id, new CUBookRequest(title, author, quantity, price, year, cateIds, description, file)));
     }
 
     @GetMapping("/{id}")

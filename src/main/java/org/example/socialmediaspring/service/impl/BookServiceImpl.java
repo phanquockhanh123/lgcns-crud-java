@@ -9,11 +9,8 @@ import org.example.socialmediaspring.common.PageNewResponse;
 import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.constant.Common;
 import org.example.socialmediaspring.constant.ErrorCodeConst;
-import org.example.socialmediaspring.dto.book.BookCategoryDto;
-import org.example.socialmediaspring.dto.book.SearchBookRequest;
+import org.example.socialmediaspring.dto.book.*;
 import org.example.socialmediaspring.dto.common.IdsRequest;
-import org.example.socialmediaspring.dto.book.BookRequest;
-import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.dto.emails.EmailDetails;
 import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.entity.BookCategory;
@@ -58,7 +55,7 @@ public class BookServiceImpl implements BookService {
     private static final int BATCH_SIZE = 1000;
 
     @Override
-    public BookCategoryDto saveBook(BookRequest bookRequest) throws IOException {
+    public BookCategoryDto saveBook(CUBookRequest bookRequest) throws IOException {
 
         if (bookRepository.existsByTitle(bookRequest.getTitle())) {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "Book title existed");
@@ -73,8 +70,13 @@ public class BookServiceImpl implements BookService {
         }
 
         String fileName = StringUtils.cleanPath(bookRequest.getFilePath().getOriginalFilename());
-        Book book = bookMapper.toBook(bookRequest);
-
+        Book book = new Book();
+        book.setTitle(bookRequest.getTitle());
+        book.setAuthor(bookRequest.getAuthor());
+        book.setPrice(bookRequest.getPrice());
+        book.setQuantity(bookRequest.getQuantity());
+        book.setDescription(bookRequest.getDescription());
+        book.setYearOfPublish(bookRequest.getYear());
         book.setIsbn(isbnGenerator.generateISBN());
         book.setQuantityAvail(book.getQuantity());
         book.setFilePath(fileName);
@@ -111,7 +113,7 @@ public class BookServiceImpl implements BookService {
                 .build();
     }
     @Override
-    public BookCategoryDto updateBook(Integer id, BookRequest request) throws IOException {
+    public BookCategoryDto updateBook(Integer id, CUBookRequest request) throws IOException {
         Book existsBook = bookRepository.findById(id)
                 .orElseThrow(() -> new BizException(ErrorCodeConst.INVALID_INPUT, "Book not found with id " + id));
 

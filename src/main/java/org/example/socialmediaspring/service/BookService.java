@@ -2,11 +2,8 @@ package org.example.socialmediaspring.service;
 
 import org.example.socialmediaspring.common.PageNewResponse;
 import org.example.socialmediaspring.common.PageResponse;
-import org.example.socialmediaspring.dto.book.BookCategoryDto;
-import org.example.socialmediaspring.dto.book.SearchBookRequest;
+import org.example.socialmediaspring.dto.book.*;
 import org.example.socialmediaspring.dto.common.IdsRequest;
-import org.example.socialmediaspring.dto.book.BookRequest;
-import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.entity.BookCategory;
 import org.example.socialmediaspring.entity.Category;
@@ -16,9 +13,9 @@ import java.io.IOException;
 import java.util.List;
 
 public interface BookService {
-    BookCategoryDto saveBook(BookRequest bookRequest) throws IOException;
+    BookCategoryDto saveBook(CUBookRequest bookRequest) throws IOException;
 
-    BookCategoryDto updateBook(Integer id, BookRequest request) throws IOException;
+    BookCategoryDto updateBook(Integer id, CUBookRequest request) throws IOException;
 
     BookResponse getBookById(Integer id);
 

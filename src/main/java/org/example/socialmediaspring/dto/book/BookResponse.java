@@ -28,10 +28,10 @@ public class BookResponse {
     private Integer yearOfPublish;
     private Integer quantity;
     private Integer quantityAvail;
+    private String filePath;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date created;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modified;
-
 
 }

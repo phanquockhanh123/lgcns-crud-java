@@ -64,6 +64,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
                 .append("b.yearOfPublish, ")
                 .append("b.quantity, ")
                 .append("b.quantityAvail, ")
+                .append("b.filePath, ")
                 .append("b.created, ")
                 .append("b.modified ")
                 .append(") ")

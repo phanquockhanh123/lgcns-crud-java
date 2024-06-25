@@ -39,7 +39,7 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
 
     @Query(value = "SELECT new org.example.socialmediaspring.dto.book.BookResponse(b.id,LISTAGG(c.name, ',') WITHIN GROUP (ORDER BY c.name) AS categoryNames," +
         " b.title, b.author, b.isbn, b.description, b.price, b.yearOfPublish, b.quantity," +
-        " b.quantityAvail, b.created, b.modified)  FROM Book b " +
+        " b.quantityAvail, b.filePath, b.created, b.modified)  FROM Book b " +
         " INNER JOIN BookCategory bc " +
         " ON bc.bookId = b.id " +
         " INNER JOIN Category c " +

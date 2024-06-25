@@ -16,7 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 public class CUBookRequest {
 
-
     @NotBlank(message = "Book title is required")
     private String title;
 
@@ -35,6 +34,4 @@ public class CUBookRequest {
     private List<Integer> cateIds;
 
     private String description;
-
-    private MultipartFile filePath;
 }

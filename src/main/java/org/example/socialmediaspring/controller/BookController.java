@@ -29,31 +29,19 @@ public class BookController {
     @PostMapping
     @PreAuthorize("hasAnyAuthority('admin:create', 'manager:create')")
     public ResponseEntity saveBook(
-             @RequestPart("title") String title,
-             @RequestPart("author") String author,
-             @RequestPart("quantity") Integer quantity,
-             @RequestPart("price") Long price,
-             @RequestPart("year") Integer year,
-             @RequestPart("cateIds") List<Integer> cateIds,
-             @RequestPart("description") String description,
+             @ModelAttribute CUBookRequest request,
              @RequestPart("filePath") MultipartFile file
             ) throws IOException {
-        return responseFactory.success(bookService.saveBook(new CUBookRequest(title, author, quantity, price, year, cateIds, description, file)));
+        return responseFactory.success(bookService.saveBook(request, file));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('admin:update', 'manager:update')")
     public ResponseEntity updateBook(
             @PathVariable Integer id,
-            @RequestPart("title") String title,
-            @RequestPart("author") String author,
-            @RequestPart("quantity") Integer quantity,
-            @RequestPart("price") Long price,
-            @RequestPart("year") Integer year,
-            @RequestPart("cateIds") List<Integer> cateIds,
-            @RequestPart("description") String description,
+            @ModelAttribute CUBookRequest request,
             @RequestPart("filePath") MultipartFile file) throws  IOException {
-        return responseFactory.success(bookService.updateBook(id, new CUBookRequest(title, author, quantity, price, year, cateIds, description, file)));
+        return responseFactory.success(bookService.updateBook(id, request, file));
     }
 
     @GetMapping("/{id}")

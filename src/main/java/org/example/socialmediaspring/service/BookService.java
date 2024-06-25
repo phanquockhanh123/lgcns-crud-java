@@ -13,9 +13,9 @@ import java.io.IOException;
 import java.util.List;
 
 public interface BookService {
-    BookCategoryDto saveBook(CUBookRequest bookRequest) throws IOException;
+    BookCategoryDto saveBook(CUBookRequest bookRequest, MultipartFile file) throws IOException;
 
-    BookCategoryDto updateBook(Integer id, CUBookRequest request) throws IOException;
+    BookCategoryDto updateBook(Integer id, CUBookRequest request, MultipartFile file) throws IOException;
 
     BookResponse getBookById(Integer id);
 

@@ -57,6 +57,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookCategoryDto saveBook(CUBookRequest bookRequest, MultipartFile file) throws IOException {
 
+
         if (bookRepository.existsByTitle(bookRequest.getTitle())) {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "Book title existed");
         }

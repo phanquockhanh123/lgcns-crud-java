@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -156,5 +157,8 @@ public class ApiExceiptionHandler {
         return responseFactory.fail(null, ErrorCodeConst.VALIDATE_VIOLATION, ex.getMessage());
     }
 
-
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<String> handleMissingServletRequestPartException(MissingServletRequestPartException ex) {
+        return responseFactory.fail(null, ErrorCodeConst.INVALID_INPUT, "Required part '" + ex.getRequestPartName() + "' is not present");
+    }
 }

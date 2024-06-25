@@ -1,12 +1,15 @@
 package org.example.socialmediaspring.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.example.socialmediaspring.common.ResponseFactory;
+import org.example.socialmediaspring.constant.ErrorCodeConst;
 import org.example.socialmediaspring.dto.book.CUBookRequest;
 import org.example.socialmediaspring.dto.book.SearchBookRequest;
 import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.book.BookRequest;
+import org.example.socialmediaspring.exception.BizException;
 import org.example.socialmediaspring.service.BookService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,7 +32,7 @@ public class BookController {
     @PostMapping
     @PreAuthorize("hasAnyAuthority('admin:create', 'manager:create')")
     public ResponseEntity saveBook(
-             @ModelAttribute CUBookRequest request,
+             @Valid @ModelAttribute CUBookRequest request,
              @RequestPart("filePath") MultipartFile file
             ) throws IOException {
         return responseFactory.success(bookService.saveBook(request, file));

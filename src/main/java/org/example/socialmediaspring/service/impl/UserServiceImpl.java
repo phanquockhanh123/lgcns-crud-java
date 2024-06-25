@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
         Page<UserResponse> users = userRepository.findUsersByConds(pageable, role, email);
 
         System.out.println("Result users: {}" + users);
-        List<UserResponse> userResponse = users.stream().filter(user -> !user.getUserName().equals(currentUsername))
+        List<UserResponse> userResponse = users.stream().filter(user -> user.getUserName() != null && !user.getUserName().equals(currentUsername) )
                 .collect(Collectors.toList());
         return new PageResponse<>(
                 userResponse,

@@ -9,6 +9,7 @@ import org.example.socialmediaspring.constant.ErrorCodeConst;
 import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.dto.book_transactions.*;
 import org.example.socialmediaspring.dto.emails.EmailDetails;
+import org.example.socialmediaspring.dto.user.BestCustomerRes;
 import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.entity.BookCategory;
 import org.example.socialmediaspring.entity.BookTransaction;
@@ -198,6 +199,8 @@ public class BookTransactionServiceImpl implements BookTransactionService {
 
         this.sendMailNoticeCommon(userInfo);
     }
+
+
 
     private void sendMailNoticeCommon(NoticeMailExpiredTimeDto user) {
         EmailDetails emailDetails = EmailDetails.builder()

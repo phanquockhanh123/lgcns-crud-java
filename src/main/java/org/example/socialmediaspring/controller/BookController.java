@@ -33,7 +33,7 @@ public class BookController {
     @PreAuthorize("hasAnyAuthority('admin:create', 'manager:create')")
     public ResponseEntity saveBook(
              @Valid @ModelAttribute CUBookRequest request,
-             @RequestPart("filePath") MultipartFile file
+             @RequestPart(value = "filePath", required = false) MultipartFile file
             ) throws IOException {
         return responseFactory.success(bookService.saveBook(request, file));
     }
@@ -43,7 +43,7 @@ public class BookController {
     public ResponseEntity updateBook(
             @PathVariable Integer id,
             @ModelAttribute CUBookRequest request,
-            @RequestPart("filePath") MultipartFile file) throws  IOException {
+            @RequestPart(value = "filePath", required = false) MultipartFile file) throws  IOException {
         return responseFactory.success(bookService.updateBook(id, request, file));
     }
 

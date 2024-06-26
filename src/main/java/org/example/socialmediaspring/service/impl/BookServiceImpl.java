@@ -56,7 +56,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookCategoryDto saveBook(CUBookRequest bookRequest, MultipartFile file) throws IOException {
-
+        if (file == null || file.isEmpty()) {
+            throw new BizException(ErrorCodeConst.INVALID_INPUT, "No file choose");
+        }
 
         if (bookRepository.existsByTitle(bookRequest.getTitle())) {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "Book title existed");
@@ -115,6 +117,7 @@ public class BookServiceImpl implements BookService {
     }
     @Override
     public BookCategoryDto updateBook(Integer id, CUBookRequest request, MultipartFile file) throws IOException {
+
         Book existsBook = bookRepository.findById(id)
                 .orElseThrow(() -> new BizException(ErrorCodeConst.INVALID_INPUT, "Book not found with id " + id));
 
@@ -124,6 +127,18 @@ public class BookServiceImpl implements BookService {
                 throw new BizException(ErrorCodeConst.INVALID_INPUT,"Book with title " + request.getTitle() + " already exists");
             }
         });
+
+        // check null filePath
+        if (file != null && !file.isEmpty()) {
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+
+            existsBook.setFilePath(fileName);
+
+            String uploadDir = "src/main/resources/static/public/book-images/" + existsBook.getId();
+
+            FileUploadUtil.saveFile(uploadDir, fileName, file);
+
+        }
 
         // check empty object list cateids
         if (request.getCateIds() == null || request.getCateIds().isEmpty()) {
@@ -136,7 +151,6 @@ public class BookServiceImpl implements BookService {
                 throw new BizException(ErrorCodeConst.VALIDATE_VIOLATION, "Category id " + categoryId + " does not exist.");
             }
         }
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
 
         existsBook.setTitle(request.getTitle());
@@ -146,13 +160,8 @@ public class BookServiceImpl implements BookService {
         existsBook.setQuantity(existsBook.getQuantity() + request.getQuantity());
         existsBook.setQuantityAvail(existsBook.getQuantityAvail() + request.getQuantity());
         existsBook.setYearOfPublish(request.getYear());
-        existsBook.setFilePath(fileName);
 
         Book savedBook =  bookRepository.save(existsBook);
-
-        String uploadDir = "src/main/resources/static/public/book-images/" + existsBook.getId();
-
-        FileUploadUtil.saveFile(uploadDir, fileName, file);
 
         // delete and create new book_categories
         List<BookCategory> bookCategoriesEntity = new ArrayList<>();

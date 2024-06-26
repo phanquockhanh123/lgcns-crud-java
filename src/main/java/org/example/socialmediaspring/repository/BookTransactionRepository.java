@@ -4,6 +4,7 @@ import org.example.socialmediaspring.dto.book.BookCategoryDto;
 import org.example.socialmediaspring.dto.book_transactions.BookTransSearchRequest;
 import org.example.socialmediaspring.dto.book_transactions.BookTransactionDto;
 import org.example.socialmediaspring.dto.book_transactions.NoticeMailExpiredTimeDto;
+import org.example.socialmediaspring.dto.user.BestCustomerRes;
 import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.entity.BookTransaction;
 import org.example.socialmediaspring.entity.Category;

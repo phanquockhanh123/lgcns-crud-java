@@ -1,5 +1,6 @@
 package org.example.socialmediaspring.repository;
 
+import org.example.socialmediaspring.dto.book.BookBestSerllerRes;
 import org.example.socialmediaspring.dto.book.BookCategoryDto;
 import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.entity.Book;
@@ -26,16 +27,15 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
             " AND (:author is null OR b.author LIKE :author)", nativeQuery = true)
     Page<Book> findBooksByConds(Pageable pageable, String title, String author);
 
-//    @Query(value = "SELECT new org.example.socialmediaspring.dto.book.BookCategoryDto(b.id, b.title, b.author, b.isbn, b.price, b.quantity, b.quantityAvail, b.yearOfPublish, b.created, b.modified)  FROM Book b " +
-//            " JOIN BookCategory bc " +
-//            " ON bc.bookId = b.id " +
-//            " JOIN Category c " +
-//            " ON bc.categoryId = c.id " +
-//            " WHERE (:title is null OR b.title LIKE CONCAT('%', :title, '%')) " +
-//            " AND (:yearFrom is null OR b.yearOfPublish >= :yearFrom) " +
-//            " AND (:yearTo is null OR b.yearOfPublish <= :yearTo) " +
-//            " AND (:author is null OR b.author LIKE CONCAT('%', :author, '%'))")
-//    Page<BookCategoryDto> searchBooksByConds(Pageable pageable, String title, String author, List<Integer> cateIds, Integer yearFrom, Integer yearTo);
+    @Query(value = "SELECT new org.example.socialmediaspring.dto.book.BookBestSerllerRes(b.id, b.title, b.author, b.isbn, b.filePath, b.price, COUNT(bt.id) as total_sales, SUM(bt.amount + bt.bonus) AS total_money) " +
+            " FROM Book b " +
+            " JOIN BookTransaction bt " +
+            " ON bt.bookId = b.id " +
+            " WHERE bt.status = 0 " +
+            " GROUP BY b.id " +
+            " ORDER BY total_money DESC " +
+            " LIMIT 10 ")
+    List<BookBestSerllerRes> getBookBestSeller();
 
     @Query(value = "SELECT new org.example.socialmediaspring.dto.book.BookResponse(b.id,LISTAGG(c.name, ',') WITHIN GROUP (ORDER BY c.name) AS categoryNames," +
         " b.title, b.author, b.isbn, b.description, b.price, b.yearOfPublish, b.quantity," +
@@ -55,4 +55,6 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
 
     @Query(value = "SELECT c FROM Category c INNER JOIN BookCategory bc on c.id = bc.categoryId INNER JOIN Book b ON bc.bookId = b.id where b.id = :id ")
     List<Category> getCatesByBookId(Integer id);
+
+
 }

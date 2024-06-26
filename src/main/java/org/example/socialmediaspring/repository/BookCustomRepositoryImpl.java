@@ -41,7 +41,6 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
 
         StringBuilder sqlCount = this.buildCountQuery();
         sqlCount.append(conditions);
-        sqlCount.append(" ORDER BY b.id DESC ");
         jakarta.persistence.Query queryCount = em.createQuery(sqlCount.toString());
         this.setParameters(parameters, queryCount);
         Long count = ((Number) queryCount.getSingleResult()).longValue();
@@ -76,7 +75,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
 
     private StringBuilder buildCountQuery() {
         StringBuilder sql = new StringBuilder();
-        sql.append("select count(*) ")
+        sql.append("select count(DISTINCT b.id) ")
                 .append(" from Book b ")
                 .append("INNER JOIN BookCategory bc ON b.id = bc.bookId ")
                 .append("INNER JOIN Category c ON c.id = bc.categoryId ");

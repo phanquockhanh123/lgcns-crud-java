@@ -3,6 +3,7 @@ package org.example.socialmediaspring.service;
 import org.example.socialmediaspring.common.PageNewResponse;
 import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.dto.book_transactions.*;
+import org.example.socialmediaspring.dto.user.BestCustomerRes;
 import org.example.socialmediaspring.entity.BookTransaction;
 
 import java.security.Principal;
@@ -20,5 +21,7 @@ public interface BookTransactionService {
     void sendMaiNoticeOTBorrowBook();
 
     void sendMailNoticeSingle(Integer id);
+
+
 
 }

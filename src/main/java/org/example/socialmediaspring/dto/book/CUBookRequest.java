@@ -1,6 +1,7 @@
 package org.example.socialmediaspring.dto.book;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,7 +31,8 @@ public class CUBookRequest {
 
     @NotNull(message = "Year of publish is required")
     private Integer year;
-    @NotNull(message = "List categories name is required")
+
+    @NotEmpty(message = "List categories name is required")
     private List<Integer> cateIds;
 
     private String description;

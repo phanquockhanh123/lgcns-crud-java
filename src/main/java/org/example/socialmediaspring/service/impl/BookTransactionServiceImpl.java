@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.*;
 import org.springframework.data.util.Pair;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -51,6 +52,9 @@ public class BookTransactionServiceImpl implements BookTransactionService {
     private final UserRepository userRepository;
 
     private final BookTransactionCustomRepository bookTransactionCustomRepository;
+
+    @Autowired
+    SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
     EmailService emailService;
@@ -99,6 +103,8 @@ public class BookTransactionServiceImpl implements BookTransactionService {
         book.setQuantityAvail(book.getQuantityAvail() - request.getQuantity());
 
         bookRepository.save(book);
+
+        simpMessagingTemplate.convertAndSend(book);
 
         return bookTransactionRepository.save(bt);
     }

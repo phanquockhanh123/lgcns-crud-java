@@ -1,5 +1,8 @@
 package org.example.socialmediaspring.service.impl;
 
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +31,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.time.Year;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -258,71 +265,56 @@ public class BookServiceImpl implements BookService {
 
     }
 
+    private Set<Book> parseCsv(MultipartFile file) throws IOException {
+        try(Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            HeaderColumnNameMappingStrategy<BookCsvRepresentation> strategy =
+                    new HeaderColumnNameMappingStrategy<>();
+            strategy.setType(BookCsvRepresentation.class);
+            CsvToBean<BookCsvRepresentation> csvToBean =
+                    new CsvToBeanBuilder<BookCsvRepresentation>(reader)
+                            .withMappingStrategy(strategy)
+                            .withIgnoreEmptyLine(true)
+                            .withIgnoreLeadingWhiteSpace(true)
+                            .build();
+            return csvToBean.parse()
+                    .stream()
+                    .map(csvLine -> Book.builder()
+                            .title(csvLine.getTitle())
+                            .author(csvLine.getAuthor())
+                            .price(csvLine.getPrice())
+                            .description(csvLine.getDescription())
+                            .filePath(csvLine.getFilePath())
+                            .isbn(csvLine.getIsbn())
+                            .quantity(csvLine.getQuantity())
+                            .quantityAvail(csvLine.getQuantityAvail())
+                            .yearOfPublish(csvLine.getYearOfPublish())
+                            .build()
+                    )
+                    .collect(Collectors.toSet());
+        }
+    }
+
     @Override
     @Transactional
-    public String bulkBookService() {
-        Random random = new Random();
+    public String bulkBookService(MultipartFile file) throws  IOException{
+        Set<Book> books = parseCsv(file);
 
-        List<Book> booksEntity = new ArrayList<>();
-        // get list category id
-        List<Integer> cateIds = categoryRepository.findIdsCategory();
+        int batchSize = 10000;
+        int totalBooks = books.size();
+        int batches = (int) Math.ceil((double) totalBooks / batchSize);
 
+        List<Book> bookList = new ArrayList<>(books);
 
-        if (cateIds.isEmpty()) {
-            throw new BizException(ErrorCodeConst.VALIDATE_VIOLATION, "Category id null, dont create book");
+        for (int i = 0; i < batches; i++) {
+            int start = i * batchSize;
+            int end = Math.min((i + 1) * batchSize, totalBooks);
+            List<Book> batch = bookList.subList(start, end);
+            bookRepository.saveAll(batch);
+
+            log.info("Insert data success with amount " + bookList.size());
         }
 
-        int maxTitleNumber = bookRepository.findMaxTitleNumber();
-
-        for (int i = 0; i < 10000; i++) {
-            Book book = new Book();
-
-            book.setTitle("title-book-bulk-" + (maxTitleNumber + i));
-            book.setAuthor("author-book-bulk-" + (maxTitleNumber + i));
-            book.setPrice((long) random.nextInt(1000));
-            book.setQuantity(random.nextInt(100));
-            book.setIsbn(isbnGenerator.generateISBN());
-            book.setQuantityAvail(20);
-            book.setYearOfPublish(getRandomYear());
-            book.setDescription("description-bulk-" + (maxTitleNumber + i));
-
-            booksEntity.add(book);
-
-
-        }
-
-        // handle batch data
-        int i = 0;
-
-        List<BookCategory> bookCatesEntity = new ArrayList<>();
-        for (Book book : booksEntity) {
-            int randomCateId = random.nextInt(cateIds.size());
-            entityManager.persist(book);
-            i++;
-            if (i % BATCH_SIZE == 0) {
-                entityManager.flush();
-                entityManager.clear();
-            }
-            // add book_categories with random cateIds
-            BookCategory bookCategory = new BookCategory();
-            bookCategory.setBookId(book.getId());
-            bookCategory.setCategoryId(cateIds.get(randomCateId));
-            bookCatesEntity.add(bookCategory);
-        }
-
-        for(BookCategory bookCategory : bookCatesEntity) {
-            entityManager.persist(bookCategory);
-            i++;
-            if (i % BATCH_SIZE == 0) {
-                entityManager.flush();
-                entityManager.clear();
-            }
-        }
-        entityManager.flush();
-        entityManager.clear();
-        //bookRepository.saveAll(booksEntity);
-
-        return "Bulk insert data successfully!";
+        return "Bulk insert data successfully! " + books.size();
     }
 
     public int getRandomYear() {

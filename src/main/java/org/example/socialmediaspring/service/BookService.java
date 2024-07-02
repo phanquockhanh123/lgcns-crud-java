@@ -25,7 +25,7 @@ public interface BookService {
 
     String deleteBooksByIds(IdsRequest id);
 
-    String bulkBookService();
+    String bulkBookService(MultipartFile file) throws  IOException;
 
     List<Category> getCategoriesByBookId(Integer id);
 

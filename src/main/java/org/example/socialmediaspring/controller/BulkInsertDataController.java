@@ -4,9 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.example.socialmediaspring.common.ResponseFactory;
 import org.example.socialmediaspring.service.BookService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("api/v1/public")
@@ -16,8 +17,8 @@ public class BulkInsertDataController {
 
     private final ResponseFactory responseFactory;
 
-    @GetMapping("/books/bulk-insert")
-    public ResponseEntity bulkBookService() {
-        return responseFactory.success(bookService.bulkBookService());
+    @PostMapping("/books/bulk-insert")
+    public ResponseEntity bulkBookService( @RequestPart("file") MultipartFile file) throws IOException {
+        return responseFactory.success(bookService.bulkBookService(file));
     }
 }

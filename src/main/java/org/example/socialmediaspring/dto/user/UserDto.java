@@ -1,17 +1,27 @@
 package org.example.socialmediaspring.dto.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.*;
+import org.example.socialmediaspring.entity.Role;
 
-@Data
+import java.util.Date;
+
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
+@Builder
 public class UserDto {
     private Long id;
     private String firstName;
     private String lastName;
+    private String userName;
     private String email;
+    private Role role;
     private String address;
-    private String password;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date created;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date modified;
 }

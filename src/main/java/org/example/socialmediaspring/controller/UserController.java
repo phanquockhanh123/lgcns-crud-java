@@ -4,9 +4,11 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.common.ResponseFactory;
 import org.example.socialmediaspring.dto.auth.ChangePasswordRequest;
+import org.example.socialmediaspring.dto.book.SearchBookRequest;
 import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.common.LongIdsRequest;
 import org.example.socialmediaspring.dto.common.ReqRes;
+import org.example.socialmediaspring.dto.user.SearchUserRequest;
 import org.example.socialmediaspring.dto.user.UserRequest;
 import org.example.socialmediaspring.entity.Role;
 import org.example.socialmediaspring.service.UserService;
@@ -57,14 +59,16 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read')")
+    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read', 'user:read')")
     public ResponseEntity findUsersByConds(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
-            @RequestParam(name = "size", defaultValue = "20", required = false) int size,
-            @Valid @RequestParam(name = "role", required = false) Role role,
-            @Valid @RequestParam(name = "email", required = false) String email
+            @RequestParam(name = "limit", defaultValue = "20", required = false) int limit,
+            @RequestParam(name = "get_total_count", required = false) Boolean getTotalCount,
+            @RequestParam(name = "email", required = false) String email,
+            @RequestParam(name = "id", required = false) Integer id,
+            @RequestParam(name = "role", required = false) Role role
     ) {
-        return responseFactory.success(userService.findUsers(page, size, role, email));
+        return responseFactory.success(userService.findUsers(new SearchUserRequest(limit, page, getTotalCount, email, id, role)));
     }
 
     @PostMapping("/change_password")

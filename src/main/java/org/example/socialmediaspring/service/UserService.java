@@ -1,11 +1,14 @@
 package org.example.socialmediaspring.service;
 
+import org.example.socialmediaspring.common.PageNewResponse;
 import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.dto.auth.ChangePasswordRequest;
 import org.example.socialmediaspring.dto.book.BookCategoryDto;
 import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.common.LongIdsRequest;
 import org.example.socialmediaspring.dto.common.ReqRes;
+import org.example.socialmediaspring.dto.user.SearchUserRequest;
+import org.example.socialmediaspring.dto.user.UserDto;
 import org.example.socialmediaspring.dto.user.UserRequest;
 import org.example.socialmediaspring.dto.user.UserResponse;
 import org.example.socialmediaspring.entity.Role;
@@ -23,7 +26,7 @@ public interface UserService {
 
     User getUser(Long userId);
 
-    PageResponse<UserResponse> findUsers(int page, int size, Role role, String email);
+    PageNewResponse<UserDto> findUsers(SearchUserRequest request);
 
     String changePassword(ChangePasswordRequest request, Principal connectedUser);
 }

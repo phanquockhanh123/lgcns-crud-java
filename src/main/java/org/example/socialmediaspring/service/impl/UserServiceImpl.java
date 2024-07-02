@@ -1,12 +1,18 @@
 package org.example.socialmediaspring.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
+import org.example.socialmediaspring.common.PageNewResponse;
 import org.example.socialmediaspring.common.PageResponse;
+import org.example.socialmediaspring.constant.Common;
 import org.example.socialmediaspring.constant.ErrorCodeConst;
 import org.example.socialmediaspring.dto.auth.ChangePasswordRequest;
 import org.example.socialmediaspring.dto.book.BookCategoryDto;
+import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.common.LongIdsRequest;
 import org.example.socialmediaspring.dto.common.ReqRes;
+import org.example.socialmediaspring.dto.user.SearchUserRequest;
+import org.example.socialmediaspring.dto.user.UserDto;
 import org.example.socialmediaspring.dto.user.UserRequest;
 import org.example.socialmediaspring.dto.user.UserResponse;
 import org.example.socialmediaspring.entity.Role;
@@ -14,13 +20,13 @@ import org.example.socialmediaspring.entity.User;
 import org.example.socialmediaspring.exception.BizException;
 import org.example.socialmediaspring.mapper.UserMapper;
 import org.example.socialmediaspring.repository.TokenRepository;
+import org.example.socialmediaspring.repository.UserCustomRepository;
 import org.example.socialmediaspring.repository.UserRepository;
 import org.example.socialmediaspring.service.UserService;
+import org.example.socialmediaspring.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
+import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,13 +35,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    UserCustomRepository userCustomRepository;
+
 
     @Autowired
     UserMapper userMapper;
@@ -119,27 +133,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageResponse<UserResponse> findUsers(int page, int size, Role role, String email) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("created").descending());
+    public PageNewResponse<UserDto> findUsers(SearchUserRequest searchReq) {
+        log.info("start search all books. body: {}", JsonUtils.objToString(searchReq));
+        PageRequest pageable = Common.getPageRequest(searchReq.getPage() - 1, searchReq.getLimit(), null);
 
-        UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Pair<Long, List<UserDto>> usersData = userCustomRepository.getUsersByConds(searchReq, pageable);
+        Long countBooks = usersData.getFirst();
+        List<UserDto> listUsers = usersData.getSecond();
 
-        String currentUsername = currentUser.getUsername();
+        Page<UserDto> pageUserDto = new PageImpl<>(listUsers, pageable, countBooks);
 
-        Page<UserResponse> users = userRepository.findUsersByConds(pageable, role, email);
+        PageNewResponse<UserDto> ib = PageNewResponse.<UserDto>builder()
+                .data(listUsers)
+                .build();
 
-        System.out.println("Result users: {}" + users);
-        List<UserResponse> userResponse = users.stream().filter(user -> user.getUserName() != null && !user.getUserName().equals(currentUsername) )
-                .collect(Collectors.toList());
-        return new PageResponse<>(
-                userResponse,
-                users.getNumber(),
-                users.getSize(),
-                users.getTotalElements(),
-                users.getTotalPages(),
-                users.isFirst(),
-                users.isLast()
-        );
+        if (Objects.nonNull(searchReq.getGetTotalCount()) && Boolean.TRUE.equals(searchReq.getGetTotalCount())) {
+            ib.setPagination(this.buildPagination(pageUserDto.getSize(), pageUserDto.getTotalPages(),
+                    pageUserDto.getNumber() + 1, pageUserDto.getTotalElements()));
+        }
+
+        log.info("end ...");
+        return ib;
     }
 
     @Override
@@ -168,5 +182,18 @@ public class UserServiceImpl implements UserService {
          userRepository.save(user);
 
         return "Change password successful!";
+    }
+
+    private Map<String, Long> buildPagination(Integer limit, Integer totalPage, Integer currentPage, Long totalRecord){
+        log.info("start buildPagination ...");
+
+        Map<String, Long> pagination = new HashMap<>();
+        pagination.put("limit", Long.valueOf(limit));
+        pagination.put("total_page", Long.valueOf(totalPage));
+        pagination.put("current_page", Long.valueOf(currentPage));
+        pagination.put("total_record", totalRecord);
+
+        log.info("end buildPagination ...");
+        return pagination;
     }
 }

@@ -32,4 +32,5 @@ public class BookTransactionDto {
     private LocalDateTime endDate;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime returnDate;
+    private Integer userId;
 }

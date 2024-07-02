@@ -14,8 +14,6 @@ public class SearchBookTransactionDto {
     private Integer limit = 20;
     private Integer page = 1;
     private Boolean getTotalCount;
-    private Boolean userId;
+    private Integer userId;
     private Integer status;
-//    private Integer dateFrom;
-//    private Integer dateTo;
 }

@@ -78,7 +78,8 @@ public class BookTransactionCustomRepoImpl implements  BookTransactionCustomRepo
                 .append("bt.bonus, ")
                 .append("bt.startDate, ")
                 .append("bt.endDate, ")
-                .append("bt.returnDate) ")
+                .append("bt.returnDate, ")
+                .append("bt.userId) ")
                 .append("FROM BookTransaction bt INNER JOIN Book b ON bt.bookId = b.id ")
                 .append("INNER JOIN User u ON bt.userId = u.id ");
         ;
@@ -99,18 +100,16 @@ public class BookTransactionCustomRepoImpl implements  BookTransactionCustomRepo
 
         sql.append(" where 1 = 1 ");
 
-        if (Objects.nonNull(searchReq.getUserId()) && searchReq.getUserId()) {
-            UserDetails currentUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            User user = userRepository.findUsersByUsername(currentUser.getUsername());
-
-            Long userId = user.getId();
-            sql.append("and bt.userId = :userId ");
-            mapParameter.put("userId", userId);
-        }
         if (Objects.nonNull(searchReq.getStatus())) {
             Integer status = searchReq.getStatus();
             sql.append("and bt.status = :status ");
             mapParameter.put("status", status);
+        }
+
+        if (Objects.nonNull(searchReq.getUserId())) {
+            Integer id = searchReq.getUserId();
+            sql.append("and bt.userId = :id ");
+            mapParameter.put("id", id);
         }
 
         sql.append("ORDER BY bt.id DESC ");

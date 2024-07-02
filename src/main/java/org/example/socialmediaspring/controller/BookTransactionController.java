@@ -44,7 +44,7 @@ public class BookTransactionController {
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "limit", defaultValue = "20", required = false) int limit,
             @RequestParam(name = "get_total_count", defaultValue = "false", required = false) Boolean getTotalCount,
-            @RequestParam(name = "userId", required = false) Boolean userId,
+            @RequestParam(name = "userId", required = false) Integer userId,
             @RequestParam(name = "status", required = false) Integer status,
             Principal connectedUser
     ) {

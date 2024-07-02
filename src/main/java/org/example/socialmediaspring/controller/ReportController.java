@@ -21,11 +21,11 @@ public class ReportController {
     @Autowired
     ReportService reportService;
 
-    @GetMapping("/book-best-sellers")
-    @PreAuthorize("hasAnyAuthority('admin:read')")
-    public ResponseEntity getBookBestSeller() {
-        return responseFactory.success(reportService.getBookBestSeller());
-    }
+//    @GetMapping("/book-best-sellers")
+//    @PreAuthorize("hasAnyAuthority('admin:read')")
+//    public ResponseEntity getBookBestSeller() {
+//        return responseFactory.success(reportService.getBookBestSeller());
+//    }
 
     @GetMapping("/best-customers")
     @PreAuthorize("hasAnyAuthority('admin:read')")

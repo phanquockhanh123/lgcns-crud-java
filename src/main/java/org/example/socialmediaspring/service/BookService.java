@@ -1,11 +1,8 @@
 package org.example.socialmediaspring.service;
 
 import org.example.socialmediaspring.common.PageNewResponse;
-import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.dto.book.*;
 import org.example.socialmediaspring.dto.common.IdsRequest;
-import org.example.socialmediaspring.entity.Book;
-import org.example.socialmediaspring.entity.BookCategory;
 import org.example.socialmediaspring.entity.Category;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,5 +26,6 @@ public interface BookService {
 
     List<Category> getCategoriesByBookId(Integer id);
 
+    PageNewResponse<BookBestSellerRes> getBooksReport(SearchBookRequest request);
 
 }

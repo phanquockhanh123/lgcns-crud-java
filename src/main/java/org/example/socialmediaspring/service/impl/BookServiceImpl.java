@@ -9,12 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.common.IsbnGenerator;
 import org.example.socialmediaspring.common.PageNewResponse;
-import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.constant.Common;
 import org.example.socialmediaspring.constant.ErrorCodeConst;
 import org.example.socialmediaspring.dto.book.*;
 import org.example.socialmediaspring.dto.common.IdsRequest;
-import org.example.socialmediaspring.dto.emails.EmailDetails;
 import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.entity.BookCategory;
 import org.example.socialmediaspring.entity.Category;
@@ -346,6 +344,30 @@ public class BookServiceImpl implements BookService {
         List<Category> cates = bookRepository.getCatesByBookId(id);
 
         return cates;
+    }
+
+    @Override
+    public PageNewResponse<BookBestSellerRes> getBooksReport(SearchBookRequest searchReq) {
+        log.info("start search books report. body: {}", JsonUtils.objToString(searchReq));
+        PageRequest pageable = Common.getPageRequest(searchReq.getPage() - 1, searchReq.getLimit(), null);
+
+        Pair<Long, List<BookBestSellerRes>> booksData = bookCustomRepositoryImpl.getBooksReport(searchReq, pageable);
+        Long countBooks = booksData.getFirst();
+        List<BookBestSellerRes> listBooks = booksData.getSecond();
+
+        Page<BookBestSellerRes> pageBookDto = new PageImpl<>(listBooks, pageable, countBooks);
+
+        PageNewResponse<BookBestSellerRes> ib = PageNewResponse.<BookBestSellerRes>builder()
+                .data(listBooks)
+                .build();
+
+        if (Objects.nonNull(searchReq.getGetTotalCount()) && Boolean.TRUE.equals(searchReq.getGetTotalCount())) {
+            ib.setPagination(this.buildPagination(pageBookDto.getSize(), pageBookDto.getTotalPages(),
+                    pageBookDto.getNumber() + 1, pageBookDto.getTotalElements()));
+        }
+
+        log.info("end ...");
+        return ib;
     }
 
 }

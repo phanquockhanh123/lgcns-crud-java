@@ -5,10 +5,9 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.socialmediaspring.dto.book.BookBestSellerRes;
 import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.dto.book.SearchBookRequest;
-import org.example.socialmediaspring.dto.book_transactions.BookTransactionDto;
-import org.example.socialmediaspring.dto.book_transactions.SearchBookTransactionDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
@@ -98,11 +97,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
             sql.append("and b.title LIKE :title ");
             mapParameter.put("title", "%" + title + "%");
         }
-//        if (Objects.nonNull(searchReq.getCateIds())) {
-//            Set<Integer> cateIds = searchReq.getCateIds();
-//            sql.append("and bc.categoryId IN (:cateIds) ");
-//            mapParameter.put("cateIds", cateIds);
-//        }
+
         if (Objects.nonNull(searchReq.getYearFrom())) {
             Integer yearFrom = searchReq.getYearFrom();
             sql.append("and b.yearOfPublish >= :yearFrom ");
@@ -120,6 +115,60 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
         for (var entry : mapParameter.entrySet()) {
             query.setParameter(entry.getKey(),entry.getValue());
         }
+    }
+
+    @Override
+    public Pair<Long, List<BookBestSellerRes>> getBooksReport(SearchBookRequest searchReq, Pageable pageable) {
+        log.info("start getBooksReport ...");
+        var mapSqlAndParameter = this.buildCondition(searchReq);
+        var conditions = mapSqlAndParameter.getFirst();
+        var parameters = mapSqlAndParameter.getSecond();
+
+        StringBuilder sql = this.buildBooksReportQuery();
+        sql.append(conditions);
+        sql.append(" GROUP BY b.id ORDER BY total_money DESC ");
+        jakarta.persistence.Query query = em.createQuery(sql.toString(), BookResponse.class)
+                .setFirstResult(pageable.getPageSize() * pageable.getPageNumber())
+                .setMaxResults(pageable.getPageSize());
+        this.setParameters(parameters, query);
+
+        var listBooks = query.getResultList();
+
+        StringBuilder sqlCount = this.buildCountBookReportQuery();
+        sqlCount.append(conditions);
+        jakarta.persistence.Query queryCount = em.createQuery(sqlCount.toString());
+        this.setParameters(parameters, queryCount);
+        Long count = ((Number) queryCount.getSingleResult()).longValue();
+
+        log.info("end getBooksReport ...");
+        return Pair.of(count, listBooks);
+    }
+
+    private StringBuilder buildBooksReportQuery() {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT ")
+                .append("new org.example.socialmediaspring.dto.book.BookBestSellerRes( ")
+                .append("b.id, ")
+                .append("b.title, ")
+                .append("b.author, ")
+                .append("b.isbn, ")
+                .append("b.quantity, ")
+                .append("b.quantityAvail, ")
+                .append("b.yearOfPublish, ")
+                .append("b.price, ")
+                .append("COALESCE(COUNT(bt.id), 0), ")
+                .append("COALESCE(SUM(bt.amount + bt.bonus), 0) as total_money ")
+                .append(") ")
+                .append("FROM Book b ")
+                .append("LEFT JOIN BookTransaction bt ON b.id = bt.bookId ");
+        return sql;
+    }
+    private StringBuilder buildCountBookReportQuery() {
+        StringBuilder sql = new StringBuilder();
+        sql.append("select count(DISTINCT b.id) ")
+                .append(" from Book b ")
+                .append("LEFT JOIN BookTransaction bt ON b.id = bt.bookId ");
+        return sql;
     }
 
 }

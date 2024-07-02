@@ -87,4 +87,17 @@ public class BookController {
         return responseFactory.success(bookService.getCategoriesByBookId(id));
     }
 
+    @GetMapping("/book-reports")
+    @PreAuthorize("hasAuthority('admin:read')")
+    public ResponseEntity getBooksReport(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(name = "limit", defaultValue = "20", required = false) int limit,
+            @RequestParam(name = "get_total_count", required = false) Boolean getTotalCount,
+            @RequestParam(name = "title", required = false) String title,
+            @RequestParam(name = "author", required = false) String author,
+            @RequestParam(name = "yearFrom", required = false) Integer yearFrom,
+            @RequestParam(name = "yearTo", required = false) Integer yearTo
+    ) {
+        return responseFactory.success(bookService.getBooksReport(new SearchBookRequest(limit, page, getTotalCount, title, author, yearFrom, yearTo)));
+    }
 }

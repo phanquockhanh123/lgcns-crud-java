@@ -1,21 +1,29 @@
 package org.example.socialmediaspring.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.example.socialmediaspring.dto.chat.ResponseMessage;
+import org.example.socialmediaspring.dto.chat.Message;
+import org.example.socialmediaspring.service.NoticeService;
+import org.example.socialmediaspring.service.ReportService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.HtmlUtils;
 
 @RestController
 @RequestMapping("/websocket")
 @Slf4j
 public class NoticeController {
-    public static final String HELLO_TEXT = "Hello from Spring Boot Backend!";
-    public static final String SECURED_TEXT = "Hello from the secured resource!";
 
-    @ResponseBody
-    @RequestMapping(path = "/hello")
-    public String sayHello() {
-        return HELLO_TEXT;
+    @Autowired
+    NoticeService noticeService;
+
+    @MessageMapping("/message")
+    @SendTo("/topic/messages")
+    public ResponseMessage getMessage(final Message message) throws InterruptedException {
+        Thread.sleep(1000);
+        noticeService.sendGlobalNotification();
+        return new ResponseMessage(HtmlUtils.htmlEscape(message.getMessageContent()));
     }
 }

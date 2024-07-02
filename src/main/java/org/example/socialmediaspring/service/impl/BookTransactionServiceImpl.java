@@ -53,6 +53,7 @@ public class BookTransactionServiceImpl implements BookTransactionService {
 
     private final BookTransactionCustomRepository bookTransactionCustomRepository;
 
+
     @Autowired
     SimpMessagingTemplate simpMessagingTemplate;
 
@@ -104,7 +105,7 @@ public class BookTransactionServiceImpl implements BookTransactionService {
 
         bookRepository.save(book);
 
-        simpMessagingTemplate.convertAndSend(book);
+        simpMessagingTemplate.convertAndSend("/topic/global-notifications",book);
 
         return bookTransactionRepository.save(bt);
     }

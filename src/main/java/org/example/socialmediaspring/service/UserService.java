@@ -7,10 +7,7 @@ import org.example.socialmediaspring.dto.book.BookCategoryDto;
 import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.common.LongIdsRequest;
 import org.example.socialmediaspring.dto.common.ReqRes;
-import org.example.socialmediaspring.dto.user.SearchUserRequest;
-import org.example.socialmediaspring.dto.user.UserDto;
-import org.example.socialmediaspring.dto.user.UserRequest;
-import org.example.socialmediaspring.dto.user.UserResponse;
+import org.example.socialmediaspring.dto.user.*;
 import org.example.socialmediaspring.entity.Role;
 import org.example.socialmediaspring.entity.User;
 
@@ -29,4 +26,6 @@ public interface UserService {
     PageNewResponse<UserDto> findUsers(SearchUserRequest request);
 
     String changePassword(ChangePasswordRequest request, Principal connectedUser);
+
+    PageNewResponse<BestCustomerRes> getUsersReport(SearchUserRequest request);
 }

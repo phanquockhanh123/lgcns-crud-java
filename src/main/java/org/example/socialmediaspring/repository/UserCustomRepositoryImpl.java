@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.dto.book.SearchBookRequest;
+import org.example.socialmediaspring.dto.user.BestCustomerRes;
 import org.example.socialmediaspring.dto.user.SearchUserRequest;
 import org.example.socialmediaspring.dto.user.UserDto;
 import org.example.socialmediaspring.entity.Role;
@@ -53,6 +54,33 @@ public class UserCustomRepositoryImpl implements UserCustomRepository{
         return Pair.of(count, listUsers);
     }
 
+    @Override
+    public Pair<Long, List<BestCustomerRes>> getCustomersReport(SearchUserRequest searchReq, Pageable pageable) {
+        log.info("start get list users report ...");
+        var mapSqlAndParameter = this.buildCondition(searchReq);
+        var conditions = mapSqlAndParameter.getFirst();
+        var parameters = mapSqlAndParameter.getSecond();
+
+        StringBuilder sql = this.buildMainReportQuery();
+        sql.append(conditions);
+        sql.append(" GROUP BY u.id ORDER BY total_money DESC ");
+        jakarta.persistence.Query query = em.createQuery(sql.toString(), BestCustomerRes.class)
+                .setFirstResult(pageable.getPageSize() * pageable.getPageNumber())
+                .setMaxResults(pageable.getPageSize());
+        this.setParameters(parameters, query);
+
+        var listUsers = query.getResultList();
+
+        StringBuilder sqlCount = this.buildCountReportQuery();
+        sqlCount.append(conditions);
+        jakarta.persistence.Query queryCount = em.createQuery(sqlCount.toString());
+        this.setParameters(parameters, queryCount);
+        Long count = ((Number) queryCount.getSingleResult()).longValue();
+
+        log.info("end get list users report ...");
+        return Pair.of(count, listUsers);
+    }
+
     private StringBuilder buildMainQuery() {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT ")
@@ -71,10 +99,36 @@ public class UserCustomRepositoryImpl implements UserCustomRepository{
         return sql;
     }
 
+    private StringBuilder buildMainReportQuery() {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT ")
+                .append("new org.example.socialmediaspring.dto.user.BestCustomerRes( ")
+                .append("u.id, ")
+                .append("u.firstName, ")
+                .append("u.lastName, ")
+                .append("u.email, ")
+                .append("u.phone, ")
+                .append("u.address, ")
+                .append("COALESCE(SUM(bt.quantity), 0), ")
+                .append("COALESCE(SUM(bt.amount + bt.bonus), 0) as total_money ")
+                .append(") ")
+                .append("FROM User u ")
+                .append("LEFT JOIN BookTransaction bt ON u.id = bt.userId ");
+        return sql;
+    }
+
     private StringBuilder buildCountQuery() {
         StringBuilder sql = new StringBuilder();
         sql.append("select count(*) ")
                 .append(" from User u ");
+        return sql;
+    }
+
+    private StringBuilder buildCountReportQuery() {
+        StringBuilder sql = new StringBuilder();
+        sql.append("select count(*) ")
+                .append(" from User u ")
+                .append("LEFT JOIN BookTransaction bt ON u.id = bt.userId ");
         return sql;
     }
 

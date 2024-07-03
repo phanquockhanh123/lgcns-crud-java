@@ -14,6 +14,7 @@ import org.springframework.web.util.HtmlUtils;
 @RestController
 @RequestMapping("/websocket")
 @Slf4j
+@CrossOrigin("*")
 public class NoticeController {
 
     @Autowired
@@ -23,7 +24,7 @@ public class NoticeController {
     @SendTo("/topic/messages")
     public ResponseMessage getMessage(final Message message) throws InterruptedException {
         Thread.sleep(1000);
-        noticeService.sendGlobalNotification();
+//        noticeService.sendGlobalNotification();
         return new ResponseMessage(HtmlUtils.htmlEscape(message.getMessageContent()));
     }
 }

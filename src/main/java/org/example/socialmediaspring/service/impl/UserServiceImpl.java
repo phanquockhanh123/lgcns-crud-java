@@ -6,15 +6,14 @@ import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.constant.Common;
 import org.example.socialmediaspring.constant.ErrorCodeConst;
 import org.example.socialmediaspring.dto.auth.ChangePasswordRequest;
+import org.example.socialmediaspring.dto.book.BookBestSellerRes;
 import org.example.socialmediaspring.dto.book.BookCategoryDto;
 import org.example.socialmediaspring.dto.book.BookResponse;
+import org.example.socialmediaspring.dto.book.SearchBookRequest;
 import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.common.LongIdsRequest;
 import org.example.socialmediaspring.dto.common.ReqRes;
-import org.example.socialmediaspring.dto.user.SearchUserRequest;
-import org.example.socialmediaspring.dto.user.UserDto;
-import org.example.socialmediaspring.dto.user.UserRequest;
-import org.example.socialmediaspring.dto.user.UserResponse;
+import org.example.socialmediaspring.dto.user.*;
 import org.example.socialmediaspring.entity.Role;
 import org.example.socialmediaspring.entity.User;
 import org.example.socialmediaspring.exception.BizException;
@@ -195,5 +194,29 @@ public class UserServiceImpl implements UserService {
 
         log.info("end buildPagination ...");
         return pagination;
+    }
+
+    @Override
+    public PageNewResponse<BestCustomerRes> getUsersReport(SearchUserRequest searchReq) {
+        log.info("start search users report. body: {}", JsonUtils.objToString(searchReq));
+        PageRequest pageable = Common.getPageRequest(searchReq.getPage() - 1, searchReq.getLimit(), null);
+
+        Pair<Long, List<BestCustomerRes>> users = userCustomRepository.getCustomersReport(searchReq, pageable);
+        Long countUsers = users.getFirst();
+        List<BestCustomerRes> listUsers = users.getSecond();
+
+        Page<BestCustomerRes> pageUserDto = new PageImpl<>(listUsers, pageable, countUsers);
+
+        PageNewResponse<BestCustomerRes> ib = PageNewResponse.<BestCustomerRes>builder()
+                .data(listUsers)
+                .build();
+
+        if (Objects.nonNull(searchReq.getGetTotalCount()) && Boolean.TRUE.equals(searchReq.getGetTotalCount())) {
+            ib.setPagination(this.buildPagination(pageUserDto.getSize(), pageUserDto.getTotalPages(),
+                    pageUserDto.getNumber() + 1, pageUserDto.getTotalElements()));
+        }
+
+        log.info("end ...");
+        return ib;
     }
 }

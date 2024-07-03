@@ -76,4 +76,17 @@ public class UserController {
         return responseFactory.success(userService.changePassword(request, connectedUser));
     }
 
+    @GetMapping("/reports")
+    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read')")
+    public ResponseEntity getUsersReport(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(name = "limit", defaultValue = "20", required = false) int limit,
+            @RequestParam(name = "get_total_count", required = false) Boolean getTotalCount,
+            @RequestParam(name = "email", required = false) String email,
+            @RequestParam(name = "id", required = false) Integer id,
+            @RequestParam(name = "role", required = false) Role role
+    ) {
+        return responseFactory.success(userService.getUsersReport(new SearchUserRequest(limit, page, getTotalCount, email, id, role)));
+    }
+
 }

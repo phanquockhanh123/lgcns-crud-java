@@ -105,7 +105,7 @@ public class BookTransactionServiceImpl implements BookTransactionService {
 
         bookRepository.save(book);
 
-        simpMessagingTemplate.convertAndSend("/topic/global-notifications",book);
+        simpMessagingTemplate.convertAndSend("/topic/books",book);
 
         return bookTransactionRepository.save(bt);
     }

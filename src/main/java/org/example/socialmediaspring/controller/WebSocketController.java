@@ -7,22 +7,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
 
 @CrossOrigin("*")
 @RestController
 public class WebSocketController {
-    private static final Logger log = LoggerFactory.getLogger(WebSocketController.class);
+
     @Autowired
     private WebSocketService service;
 
     @MessageMapping("/books")
     @SendTo("/topic/book")
     public String sendMessage(@RequestBody final Message message) {
-        log.info("Start send message ");
 
         return "Borrow books success!";
     }

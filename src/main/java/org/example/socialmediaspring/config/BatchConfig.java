@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -18,6 +19,7 @@ import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -27,6 +29,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.io.File;
 import java.lang.management.PlatformManagedObject;
 
 @Configuration
@@ -39,9 +42,10 @@ public class BatchConfig {
     private final PlatformTransactionManager platformTransactionManager;
 
     @Bean
-    public FlatFileItemReader<Book> itemReader() {
+    @StepScope
+    public FlatFileItemReader<Book> itemReader(@Value("#{jobParameters[fullPathFileName]}") String pathToFIle) {
         FlatFileItemReader<Book> itemReader = new FlatFileItemReader<>();
-        itemReader.setResource(new FileSystemResource("src/main/resources/books.csv"));
+        itemReader.setResource(new FileSystemResource(new File(pathToFIle)));
         itemReader.setName("csvReader");
         itemReader.setLinesToSkip(1);
         itemReader.setLineMapper(lineMapper());
@@ -64,10 +68,10 @@ public class BatchConfig {
     }
 
     @Bean
-    public Step importStep() {
+    public Step importStep( FlatFileItemReader<Book> itemReader) {
         return new StepBuilder("csvImport", jobRepository)
                 .<Book, Book>chunk(10, platformTransactionManager)
-                .reader(itemReader())
+                .reader(itemReader)
                 .processor(processor())
                 .writer(writer())
                 .taskExecutor(taskExecutor())
@@ -75,10 +79,10 @@ public class BatchConfig {
     }
 
     @Bean
-    public Job runJob() {
+    public Job runJob(FlatFileItemReader<Book> itemReader) {
         return new JobBuilder("importBooks", jobRepository)
                 .incrementer(new RunIdIncrementer())
-                .start(importStep())
+                .start(importStep(itemReader))
                 .build();
     }
 

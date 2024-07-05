@@ -20,8 +20,7 @@ public class WebSocketController {
 
     @MessageMapping("/books")
     @SendTo("/topic/book")
-    public String sendMessage(@RequestBody final Message message) {
-
-        return "Borrow books success!";
+    public Message sendMessage(final Message message) throws Exception {
+        return message;
     }
 }

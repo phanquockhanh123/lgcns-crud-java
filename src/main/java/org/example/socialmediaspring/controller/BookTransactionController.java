@@ -9,8 +9,10 @@ import org.example.socialmediaspring.dto.book_transactions.BookTransIdsRequest;
 import org.example.socialmediaspring.dto.book_transactions.BookTransSearchRequest;
 import org.example.socialmediaspring.dto.book_transactions.BookTransactionRequest;
 import org.example.socialmediaspring.dto.book_transactions.SearchBookTransactionDto;
+import org.example.socialmediaspring.dto.notifications.BookBorrowedNotification;
 import org.example.socialmediaspring.service.BookTransactionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,13 +51,6 @@ public class BookTransactionController {
             Principal connectedUser
     ) {
         return responseFactory.success(bookTransactionService.getBookTransByConds(new SearchBookTransactionDto(limit, page, getTotalCount, userId, status), connectedUser));
-    }
-
-    @Scheduled(cron = "0 6 * * *")
-    @GetMapping("/notice")
-    public ResponseEntity sendNoticedUserOvertimeBorrowBook() {
-        bookTransactionService.sendMaiNoticeOTBorrowBook();
-        return responseFactory.success("Send email notice book transaction expired time");
     }
 
     @PostMapping("/send-mail-notice/{id}")

@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 
 @RestController
@@ -29,23 +30,32 @@ public class BulkInsertDataController {
 
     private final Job job;
 
+    private final String TEMP_STORAGE = System.getProperty("user.home") + File.separator + "Downloads" + File.separator;
+
     @PostMapping("/books/bulk-insert")
     public ResponseEntity bulkBookService( @RequestPart("file") MultipartFile file) throws IOException {
         return responseFactory.success(bookService.bulkBookService(file));
     }
 
     @PostMapping("/books/insert")
-    public void importCsvToDBJob() {
-        JobParameters jobParameters = new JobParametersBuilder()
-                .addLong("startAt", System.currentTimeMillis())
-                .toJobParameters();
+    public void importCsvToDBJob(@RequestParam("file") MultipartFile multipartFile) {
 
         try  {
+            String originalFileName = multipartFile.getOriginalFilename();
+            File fileToImport = new File(TEMP_STORAGE  + originalFileName);
+            multipartFile.transferTo(fileToImport);
+
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addString("fullPathFileName", TEMP_STORAGE  + originalFileName)
+                    .addLong("startAt", System.currentTimeMillis())
+                    .toJobParameters();
+
             jobLauncher.run(job, jobParameters);
         } catch (JobExecutionAlreadyRunningException
                  | JobRestartException
                  | JobInstanceAlreadyCompleteException
-                 |JobParametersInvalidException e) {
+                 | JobParametersInvalidException
+                 | IOException e) {
             e.printStackTrace();
         }
     }

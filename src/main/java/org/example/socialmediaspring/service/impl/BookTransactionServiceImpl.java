@@ -9,12 +9,14 @@ import org.example.socialmediaspring.constant.ErrorCodeConst;
 import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.dto.book_transactions.*;
 import org.example.socialmediaspring.dto.emails.EmailDetails;
+import org.example.socialmediaspring.dto.notifications.BookBorrowedNotification;
 import org.example.socialmediaspring.dto.user.BestCustomerRes;
 import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.entity.BookCategory;
 import org.example.socialmediaspring.entity.BookTransaction;
 import org.example.socialmediaspring.entity.User;
 import org.example.socialmediaspring.exception.BizException;
+import org.example.socialmediaspring.listener.WebSockerHandler;
 import org.example.socialmediaspring.repository.BookRepository;
 import org.example.socialmediaspring.repository.BookTransactionCustomRepository;
 import org.example.socialmediaspring.repository.BookTransactionRepository;
@@ -32,6 +34,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.socket.WebSocketHandler;
 
 import java.security.Principal;
 import java.sql.Timestamp;
@@ -59,6 +62,8 @@ public class BookTransactionServiceImpl implements BookTransactionService {
 
     @Autowired
     EmailService emailService;
+
+    private final WebSockerHandler webSocketHandler;
 
 
     @Override
@@ -103,9 +108,21 @@ public class BookTransactionServiceImpl implements BookTransactionService {
         // handle case quantity - quantity borrow books table
         book.setQuantityAvail(book.getQuantityAvail() - request.getQuantity());
 
-        bookRepository.save(book);
+        Book bookUpdate = bookRepository.save(book);
 
-        simpMessagingTemplate.convertAndSend("/topic/books",book);
+        // push notification
+        BookBorrowedNotification notification = new BookBorrowedNotification(
+                bookUpdate.getTitle(), LocalDateTime.now()
+        );
+
+        log.info("Borrow book success! with notification: " + notification);
+
+        try {
+            webSocketHandler.sendNotification(notification);
+        } catch (Exception e) {
+            log.info(String.valueOf(e));
+        }
+
 
         return bookTransactionRepository.save(bt);
     }

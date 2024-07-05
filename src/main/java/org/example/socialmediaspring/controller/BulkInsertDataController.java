@@ -1,6 +1,7 @@
 package org.example.socialmediaspring.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.common.ResponseFactory;
 import org.example.socialmediaspring.service.BookService;
 import org.springframework.batch.core.*;
@@ -9,6 +10,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +19,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("api/v1/public")
 @RequiredArgsConstructor
+@Slf4j
 public class BulkInsertDataController {
     private final BookService bookService;
 
@@ -45,6 +48,5 @@ public class BulkInsertDataController {
                  |JobParametersInvalidException e) {
             e.printStackTrace();
         }
-
     }
 }

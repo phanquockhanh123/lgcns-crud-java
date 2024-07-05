@@ -25,15 +25,6 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
             " AND (:author is null OR b.author LIKE :author)", nativeQuery = true)
     Page<Book> findBooksByConds(Pageable pageable, String title, String author);
 
-//    @Query(value = "SELECT new org.example.socialmediaspring.dto.book.BookBestSellerRes(b.id, b.title, b.author, b.isbn, b.filePath, b.price, COUNT(bt.id) as total_sales, SUM(bt.amount + bt.bonus) AS total_money) " +
-//            " FROM Book b " +
-//            " JOIN BookTransaction bt " +
-//            " ON bt.bookId = b.id " +
-//            " WHERE bt.status = 0 " +
-//            " GROUP BY b.id " +
-//            " ORDER BY total_money DESC " +
-//            " LIMIT 10 ")
-//    List<BookBestSellerRes> getBookBestSeller();
 
     @Query(value = "SELECT new org.example.socialmediaspring.dto.book.BookResponse(b.id,LISTAGG(c.name, ',') WITHIN GROUP (ORDER BY c.name) AS categoryNames," +
         " b.title, b.author, b.isbn, b.description, b.price, b.yearOfPublish, b.quantity," +

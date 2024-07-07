@@ -29,13 +29,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.*;
 import org.springframework.data.util.Pair;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.WebSocketHandler;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -55,10 +55,6 @@ public class BookTransactionServiceImpl implements BookTransactionService {
     private final UserRepository userRepository;
 
     private final BookTransactionCustomRepository bookTransactionCustomRepository;
-
-
-    @Autowired
-    SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
     EmailService emailService;
@@ -86,8 +82,8 @@ public class BookTransactionServiceImpl implements BookTransactionService {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "So luong sach khong du cung cap");
         }
         // check startDate less than endDate
-        Long  startDate = DateTimeUtils.convertToTimestamp(request.getStartDate());
-        Long  endDate = DateTimeUtils.convertToTimestamp(request.getEndDate());
+        Long startDate = DateTimeUtils.convertToTimestamp(request.getStartDate());
+        Long endDate = DateTimeUtils.convertToTimestamp(request.getEndDate());
         if (startDate > endDate) {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "Thoi gian khong hop le");
         }
@@ -110,21 +106,22 @@ public class BookTransactionServiceImpl implements BookTransactionService {
 
         Book bookUpdate = bookRepository.save(book);
 
+        BookTransaction bookTrans = bookTransactionRepository.save(bt);
+
         // push notification
-        BookBorrowedNotification notification = new BookBorrowedNotification(
-                bookUpdate.getTitle(), LocalDateTime.now()
-        );
+        String notification = "Book " + bookUpdate.getTitle() + " by " + userInfo.getFirstName() + " " + userInfo.getLastName() + " at  time " + DateTimeUtils.localDateTime(LocalDateTime.now());
 
         log.info("Borrow book success! with notification: " + notification);
 
         try {
             webSocketHandler.sendNotification(notification);
-        } catch (Exception e) {
+        } catch (IOException e) {
+            e.printStackTrace();
             log.info(String.valueOf(e));
         }
 
 
-        return bookTransactionRepository.save(bt);
+        return bookTrans;
     }
 
     @Override

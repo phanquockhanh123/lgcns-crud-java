@@ -1,9 +1,12 @@
 package org.example.socialmediaspring.utils;
 
+import org.springframework.cglib.core.Local;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 public class DateTimeUtils {
     /**
@@ -31,6 +34,12 @@ public class DateTimeUtils {
         return Instant.ofEpochMilli(timestamp)
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
+    }
+
+    public static String localDateTime(LocalDateTime dateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss");
+        String formattedDateTime = dateTime.format(formatter);
+        return formattedDateTime;
     }
 
 }

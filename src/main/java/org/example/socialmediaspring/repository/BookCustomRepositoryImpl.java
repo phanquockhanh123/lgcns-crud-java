@@ -7,8 +7,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.dto.book.BookBestSellerRes;
 import org.example.socialmediaspring.dto.book.BookResponse;
+import org.example.socialmediaspring.dto.book.FilterBookReportResquest;
 import org.example.socialmediaspring.dto.book.SearchBookRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
@@ -118,15 +120,24 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
     }
 
     @Override
-    public Pair<Long, List<BookBestSellerRes>> getBooksReport(SearchBookRequest searchReq, Pageable pageable) {
+    public Pair<Long, List<BookBestSellerRes>> getBooksReport(FilterBookReportResquest searchReq, Pageable pageable) {
         log.info("start getBooksReport ...");
-        var mapSqlAndParameter = this.buildCondition(searchReq);
+        var mapSqlAndParameter = this.buildReportCondition(searchReq);
         var conditions = mapSqlAndParameter.getFirst();
         var parameters = mapSqlAndParameter.getSecond();
 
         StringBuilder sql = this.buildBooksReportQuery();
         sql.append(conditions);
-        sql.append(" GROUP BY b.id ORDER BY total_money DESC ");
+
+        if (Objects.nonNull(searchReq.getSortField()) && Objects.nonNull(searchReq.getSortOrder())) {
+            String sortOrder = searchReq.getSortOrder();
+            String sortField = searchReq.getSortField();
+
+            sql.append(" GROUP BY b.id ORDER BY ").append(sortField).append(" ").append(sortOrder);
+        } else {
+            sql.append(" GROUP BY b.id ORDER BY totalMoney DESC");
+        }
+
         jakarta.persistence.Query query = em.createQuery(sql.toString(), BookResponse.class)
                 .setFirstResult(pageable.getPageSize() * pageable.getPageNumber())
                 .setMaxResults(pageable.getPageSize());
@@ -156,8 +167,8 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
                 .append("b.quantityAvail, ")
                 .append("b.yearOfPublish, ")
                 .append("b.price, ")
-                .append("COALESCE(COUNT(bt.id), 0), ")
-                .append("COALESCE(SUM(bt.amount + bt.bonus), 0) as total_money ")
+                .append("COALESCE(COUNT(bt.id), 0) as totalSale, ")
+                .append("COALESCE(SUM(bt.amount + bt.bonus), 0) as totalMoney ")
                 .append(") ")
                 .append("FROM Book b ")
                 .append("LEFT JOIN BookTransaction bt ON b.id = bt.bookId ");
@@ -169,6 +180,38 @@ public class BookCustomRepositoryImpl implements BookCustomRepository{
                 .append(" from Book b ")
                 .append("LEFT JOIN BookTransaction bt ON b.id = bt.bookId ");
         return sql;
+    }
+
+    private Pair<StringBuilder, Map<String,Object>> buildReportCondition(FilterBookReportResquest searchReq) {
+        Map<String,Object> mapParameter = new HashMap<>();
+        StringBuilder sql = new StringBuilder();
+
+        sql.append(" where 1 = 1 ");
+
+        if (Objects.nonNull(searchReq.getAuthor()) && !searchReq.getAuthor().isEmpty()) {
+            String author = searchReq.getAuthor();
+            sql.append("and b.author LIKE :author ");
+            mapParameter.put("author", "%" + author + "%");
+        }
+        if (Objects.nonNull(searchReq.getTitle()) && !searchReq.getTitle().isEmpty()) {
+            String title = searchReq.getTitle();
+            sql.append("and b.title LIKE :title ");
+            mapParameter.put("title", "%" + title + "%");
+        }
+
+        if (Objects.nonNull(searchReq.getYearFrom())) {
+            Integer yearFrom = searchReq.getYearFrom();
+            sql.append("and b.yearOfPublish >= :yearFrom ");
+            mapParameter.put("yearFrom", yearFrom);
+        }
+
+        if (Objects.nonNull(searchReq.getYearTo())) {
+            Integer yearTo = searchReq.getYearTo();
+            sql.append("and b.yearOfPublish <= :yearTo ");
+            mapParameter.put("yearTo", yearTo);
+        }
+
+        return Pair.of(sql, mapParameter);
     }
 
 }

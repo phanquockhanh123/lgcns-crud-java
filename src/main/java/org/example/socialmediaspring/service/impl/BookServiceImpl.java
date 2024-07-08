@@ -347,10 +347,11 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public PageNewResponse<BookBestSellerRes> getBooksReport(SearchBookRequest searchReq) {
+    public PageNewResponse<BookBestSellerRes> getBooksReport(FilterBookReportResquest searchReq) {
         log.info("start search books report. body: {}", JsonUtils.objToString(searchReq));
         PageRequest pageable = Common.getPageRequest(searchReq.getPage() - 1, searchReq.getLimit(), null);
 
+        log.info("page request. body: {}", JsonUtils.objToString(pageable));
         Pair<Long, List<BookBestSellerRes>> booksData = bookCustomRepositoryImpl.getBooksReport(searchReq, pageable);
         Long countBooks = booksData.getFirst();
         List<BookBestSellerRes> listBooks = booksData.getSecond();

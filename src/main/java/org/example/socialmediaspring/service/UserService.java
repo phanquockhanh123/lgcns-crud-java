@@ -4,6 +4,7 @@ import org.example.socialmediaspring.common.PageNewResponse;
 import org.example.socialmediaspring.common.PageResponse;
 import org.example.socialmediaspring.dto.auth.ChangePasswordRequest;
 import org.example.socialmediaspring.dto.book.BookCategoryDto;
+import org.example.socialmediaspring.dto.book.FilterBookReportResquest;
 import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.common.LongIdsRequest;
 import org.example.socialmediaspring.dto.common.ReqRes;
@@ -27,5 +28,5 @@ public interface UserService {
 
     String changePassword(ChangePasswordRequest request, Principal connectedUser);
 
-    PageNewResponse<BestCustomerRes> getUsersReport(SearchUserRequest request);
+    PageNewResponse<BestCustomerRes> getUsersReport(FilterUserRequest request);
 }

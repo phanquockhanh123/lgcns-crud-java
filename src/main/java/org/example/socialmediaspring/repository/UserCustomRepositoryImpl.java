@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.dto.book.SearchBookRequest;
 import org.example.socialmediaspring.dto.user.BestCustomerRes;
+import org.example.socialmediaspring.dto.user.FilterUserRequest;
 import org.example.socialmediaspring.dto.user.SearchUserRequest;
 import org.example.socialmediaspring.dto.user.UserDto;
 import org.example.socialmediaspring.entity.Role;
@@ -55,15 +56,22 @@ public class UserCustomRepositoryImpl implements UserCustomRepository{
     }
 
     @Override
-    public Pair<Long, List<BestCustomerRes>> getCustomersReport(SearchUserRequest searchReq, Pageable pageable) {
+    public Pair<Long, List<BestCustomerRes>> getCustomersReport(FilterUserRequest searchReq, Pageable pageable) {
         log.info("start get list users report ...");
-        var mapSqlAndParameter = this.buildCondition(searchReq);
+        var mapSqlAndParameter = this.buildReportCondition(searchReq);
         var conditions = mapSqlAndParameter.getFirst();
         var parameters = mapSqlAndParameter.getSecond();
 
         StringBuilder sql = this.buildMainReportQuery();
         sql.append(conditions);
-        sql.append(" GROUP BY u.id ORDER BY total_money DESC ");
+        if (Objects.nonNull(searchReq.getSortField()) && Objects.nonNull(searchReq.getSortOrder())) {
+            String sortOrder = searchReq.getSortOrder();
+            String sortField = searchReq.getSortField();
+
+            sql.append(" GROUP BY u.id ORDER BY ").append(sortField).append(" ").append(sortOrder);
+        } else {
+            sql.append(" GROUP BY u.id ORDER BY totalMoneyBuy DESC");
+        }
         jakarta.persistence.Query query = em.createQuery(sql.toString(), BestCustomerRes.class)
                 .setFirstResult(pageable.getPageSize() * pageable.getPageNumber())
                 .setMaxResults(pageable.getPageSize());
@@ -109,8 +117,8 @@ public class UserCustomRepositoryImpl implements UserCustomRepository{
                 .append("u.email, ")
                 .append("u.phone, ")
                 .append("u.address, ")
-                .append("COALESCE(SUM(bt.quantity), 0), ")
-                .append("COALESCE(SUM(bt.amount + bt.bonus), 0) as total_money ")
+                .append("COALESCE(SUM(bt.quantity), 0) as totalBookBuy, ")
+                .append("COALESCE(SUM(bt.amount + bt.bonus), 0) as totalMoneyBuy ")
                 .append(") ")
                 .append("FROM User u ")
                 .append("LEFT JOIN BookTransaction bt ON u.id = bt.userId ");
@@ -161,5 +169,31 @@ public class UserCustomRepositoryImpl implements UserCustomRepository{
         for (var entry : mapParameter.entrySet()) {
             query.setParameter(entry.getKey(),entry.getValue());
         }
+    }
+
+    private Pair<StringBuilder, Map<String,Object>> buildReportCondition(FilterUserRequest searchReq) {
+        Map<String,Object> mapParameter = new HashMap<>();
+        StringBuilder sql = new StringBuilder();
+
+        sql.append(" where 1 = 1 ");
+
+        if (Objects.nonNull(searchReq.getEmail()) && !searchReq.getEmail().isEmpty()) {
+            String email = searchReq.getEmail();
+            sql.append("and u.email LIKE :email ");
+            mapParameter.put("email", "%" + email + "%");
+        }
+        if (Objects.nonNull(searchReq.getRole())) {
+            Role role = searchReq.getRole();
+            sql.append("and u.role = :role ");
+            mapParameter.put("role", role);
+        }
+
+        if (Objects.nonNull(searchReq.getId())) {
+            Integer id = searchReq.getId();
+            sql.append("and u.id = :id ");
+            mapParameter.put("id", id);
+        }
+
+        return Pair.of(sql, mapParameter);
     }
 }

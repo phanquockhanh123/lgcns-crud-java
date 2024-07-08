@@ -8,6 +8,7 @@ import org.example.socialmediaspring.dto.book.SearchBookRequest;
 import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.common.LongIdsRequest;
 import org.example.socialmediaspring.dto.common.ReqRes;
+import org.example.socialmediaspring.dto.user.FilterUserRequest;
 import org.example.socialmediaspring.dto.user.SearchUserRequest;
 import org.example.socialmediaspring.dto.user.UserRequest;
 import org.example.socialmediaspring.entity.Role;
@@ -84,9 +85,11 @@ public class UserController {
             @RequestParam(name = "get_total_count", required = false) Boolean getTotalCount,
             @RequestParam(name = "email", required = false) String email,
             @RequestParam(name = "id", required = false) Integer id,
-            @RequestParam(name = "role", required = false) Role role
+            @RequestParam(name = "role", required = false) Role role,
+            @RequestParam(name = "sortOrder", required = false) String sortOrder,
+            @RequestParam(name = "sortField", required = false) String sortField
     ) {
-        return responseFactory.success(userService.getUsersReport(new SearchUserRequest(limit, page, getTotalCount, email, id, role)));
+        return responseFactory.success(userService.getUsersReport(new FilterUserRequest(limit, page, getTotalCount, email, id, role, sortOrder, sortField)));
     }
 
 }

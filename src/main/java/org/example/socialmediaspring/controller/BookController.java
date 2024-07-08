@@ -6,11 +6,13 @@ import lombok.RequiredArgsConstructor;
 import org.example.socialmediaspring.common.ResponseFactory;
 import org.example.socialmediaspring.constant.ErrorCodeConst;
 import org.example.socialmediaspring.dto.book.CUBookRequest;
+import org.example.socialmediaspring.dto.book.FilterBookReportResquest;
 import org.example.socialmediaspring.dto.book.SearchBookRequest;
 import org.example.socialmediaspring.dto.common.IdsRequest;
 import org.example.socialmediaspring.dto.book.BookRequest;
 import org.example.socialmediaspring.exception.BizException;
 import org.example.socialmediaspring.service.BookService;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -96,8 +98,10 @@ public class BookController {
             @RequestParam(name = "title", required = false) String title,
             @RequestParam(name = "author", required = false) String author,
             @RequestParam(name = "yearFrom", required = false) Integer yearFrom,
-            @RequestParam(name = "yearTo", required = false) Integer yearTo
+            @RequestParam(name = "yearTo", required = false) Integer yearTo,
+            @RequestParam(name = "sortOrder", required = false) String sortOrder,
+            @RequestParam(name = "sortField", required = false) String sortField
     ) {
-        return responseFactory.success(bookService.getBooksReport(new SearchBookRequest(limit, page, getTotalCount, title, author, yearFrom, yearTo)));
+        return responseFactory.success(bookService.getBooksReport(new FilterBookReportResquest(limit, page, getTotalCount, title, author, yearFrom, yearTo, sortOrder, sortField)));
     }
 }

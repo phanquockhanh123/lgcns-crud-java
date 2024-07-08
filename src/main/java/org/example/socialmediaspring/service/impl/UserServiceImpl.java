@@ -197,7 +197,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageNewResponse<BestCustomerRes> getUsersReport(SearchUserRequest searchReq) {
+    public PageNewResponse<BestCustomerRes> getUsersReport(FilterUserRequest searchReq) {
         log.info("start search users report. body: {}", JsonUtils.objToString(searchReq));
         PageRequest pageable = Common.getPageRequest(searchReq.getPage() - 1, searchReq.getLimit(), null);
 

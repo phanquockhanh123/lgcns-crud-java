@@ -26,6 +26,6 @@ public interface BookService {
 
     List<Category> getCategoriesByBookId(Integer id);
 
-    PageNewResponse<BookBestSellerRes> getBooksReport(SearchBookRequest request);
+    PageNewResponse<BookBestSellerRes> getBooksReport(FilterBookReportResquest request);
 
 }

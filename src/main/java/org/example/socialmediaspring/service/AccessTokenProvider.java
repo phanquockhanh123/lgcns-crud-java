@@ -18,7 +18,7 @@ public class AccessTokenProvider {
     public String getAccessToken(){
         String header = Base64.getEncoder().encodeToString(String.format("%s:%s", props.getApiUserId(), props.getApiKey()).getBytes()
         );
-
+        log.info("Header " + header);
         var authResponse = authClient.getAccessToken("Basic "+header, props.getOcpApimSubscriptionKey());
 
         log.info("access token: " + authResponse.accessToken());

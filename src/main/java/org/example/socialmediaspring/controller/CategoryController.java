@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/api/v1/admin/categories")
 @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'USER')")
 public class CategoryController {

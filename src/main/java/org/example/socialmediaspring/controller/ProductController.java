@@ -20,6 +20,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/admin/products")
+@CrossOrigin("*")
 @RequiredArgsConstructor
 
 public class ProductController {
@@ -44,7 +45,7 @@ public class ProductController {
             @RequestParam(name = "priceFrom", required = false) Integer priceFrom,
             @RequestParam(name = "priceTo", required = false) Integer priceTo
     ){
-        return responseFactory.success(productService.findAllProducts(new SearchProductRequest(page, limit, getTotalCount, title, category, priceFrom, priceTo)));
+        return responseFactory.success(productService.findAllProducts(new SearchProductRequest( limit, page, getTotalCount, title, category, priceFrom, priceTo)));
     }
 
     @PutMapping(path = "/update/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })

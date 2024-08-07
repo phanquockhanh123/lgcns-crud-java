@@ -101,7 +101,6 @@ public class ProductServiceImpl implements ProductService {
 
         PageRequest pageable = Common.getPageRequest(searchReq.getPage() - 1, searchReq.getLimit(), null);
 
-
         Pair<Long, List<SearchProductDto>> productsData = productCustomRepositoryImpl.getProductsByConds(searchReq, pageable);
         Long countProducts = productsData.getFirst();
         List<SearchProductDto> listProducts = productsData.getSecond();

@@ -33,6 +33,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -54,8 +55,8 @@ public class ProductServiceImpl implements ProductService {
     private final IsbnGenerator isbnGenerator;
 
     @Override
-    public CreateProductDto saveProduct(CUProductRequest productDto) {
-        if (productDto.getThumbnail() == null || productDto.getThumbnail().isEmpty()) {
+    public CreateProductDto saveProduct(CUProductRequest productDto, MultipartFile thumbnail) {
+        if (thumbnail == null || thumbnail.isEmpty()) {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "No file choose");
         }
 
@@ -67,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
         Category category = categoryRepository.findById(productDto.getCategory())
                 .orElseThrow(() -> new BizException(ErrorCodeConst.INVALID_INPUT,"Category not found"));
 
-        String fileName = StringUtils.cleanPath(Objects.requireNonNull(productDto.getThumbnail().getOriginalFilename()));
+        String fileName = StringUtils.cleanPath(Objects.requireNonNull(thumbnail.getOriginalFilename()));
         Product product = new Product();
         product.setTitle(productDto.getTitle());
         product.setDescription(productDto.getDescription());
@@ -90,7 +91,7 @@ public class ProductServiceImpl implements ProductService {
 
         String uploadDir = "src/main/resources/static/public/book-images/" + product.getId();
 
-        FileUploadUtil.saveFile(uploadDir, fileName, productDto.getThumbnail());
+        FileUploadUtil.saveFile(uploadDir, fileName, thumbnail);
 
         return productMapper.toProductDto(newProduct);
 
@@ -142,7 +143,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public CreateProductDto updateProduct(Long id,CUProductRequest request) {
+    public CreateProductDto updateProduct(Long id,CUProductRequest request, MultipartFile thumbnail) {
         // check product exists in db
         Product existsProduct = productRepository.findById(id)
                 .orElseThrow(() -> new BizException(ErrorCodeConst.INVALID_INPUT, "Product not found with id " + id));
@@ -159,14 +160,14 @@ public class ProductServiceImpl implements ProductService {
         });
 
         // check null filePath
-        if (request.getThumbnail() != null && !request.getThumbnail().isEmpty()) {
-            String fileName = StringUtils.cleanPath(request.getThumbnail().getOriginalFilename());
+        if (thumbnail != null && !thumbnail.isEmpty()) {
+            String fileName = StringUtils.cleanPath(thumbnail.getOriginalFilename());
 
             existsProduct.setThumbnail(fileName);
 
             String uploadDir = "src/main/resources/static/public/book-images/" + existsProduct.getId();
 
-            FileUploadUtil.saveFile(uploadDir, fileName, request.getThumbnail());
+            FileUploadUtil.saveFile(uploadDir, fileName, thumbnail);
 
         }
 
@@ -189,9 +190,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto getProductById(Long id) {
+    public SearchProductDto getProductById(Long id) {
         if (!productRepository.existsById(id)) {
-            throw new EntityNotFoundException("Product not existed");
+            throw new BizException(ErrorCodeConst.INVALID_INPUT,  "Product not existed");
         }
 
         return productRepository.getProductDetail(id);

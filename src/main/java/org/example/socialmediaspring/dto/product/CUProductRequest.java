@@ -1,8 +1,13 @@
 package org.example.socialmediaspring.dto.product;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 import org.example.socialmediaspring.entity.Category;
+import org.hibernate.validator.constraints.Range;
+import org.springframework.format.annotation.NumberFormat;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
@@ -42,8 +47,6 @@ public class CUProductRequest {
         private String returnPolicy;
 
         private Integer minimumOrderQuantity;
-
-        private MultipartFile thumbnail;
 
         @NotBlank(message = "Category is mandatory")
         private Integer category;

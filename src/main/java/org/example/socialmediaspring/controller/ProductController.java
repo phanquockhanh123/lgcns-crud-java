@@ -31,8 +31,10 @@ public class ProductController {
 
     @PostMapping(path = "/create", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     @PreAuthorize("hasAnyAuthority('admin:update', 'manager:update')")
-    public ResponseEntity saveProduct(@ModelAttribute CUProductRequest productDto){
-        return responseFactory.success(productService.saveProduct(productDto));
+    public ResponseEntity saveProduct(
+            @ModelAttribute CUProductRequest productDto,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail) throws  IOException{
+        return responseFactory.success(productService.saveProduct(productDto, thumbnail));
     }
 
     @GetMapping
@@ -52,8 +54,9 @@ public class ProductController {
     @PreAuthorize("hasAnyAuthority('admin:update', 'manager:update')")
     public ResponseEntity updateProduct(
             @PathVariable Long id,
-            @ModelAttribute CUProductRequest request ) {
-        return responseFactory.success(productService.updateProduct(id, request));
+            @ModelAttribute CUProductRequest request ,
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail) throws  IOException {
+        return responseFactory.success(productService.updateProduct(id, request, thumbnail));
     }
 
     @GetMapping("/detail/{id}")

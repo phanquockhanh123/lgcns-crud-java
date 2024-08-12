@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/v1/admin/products")
+@RequestMapping("/admin/products")
 @CrossOrigin("*")
 @RequiredArgsConstructor
 

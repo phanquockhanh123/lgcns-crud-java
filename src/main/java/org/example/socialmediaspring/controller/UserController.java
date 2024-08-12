@@ -23,7 +23,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/api/v1/admin/users")
+@RequestMapping("/admin/users")
 @Slf4j
 @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
 public class UserController {

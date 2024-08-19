@@ -1,21 +1,19 @@
 package org.example.socialmediaspring.dto.product;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.example.socialmediaspring.entity.Kind;
+import lombok.*;
+import org.example.socialmediaspring.entity.Category;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
-import java.util.Set;
-
+@Getter
+@Setter
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductKindDto {
+@Builder
+public class CreateProductDto {
+    private Long id;
+
     private String title;
 
     private String description;
@@ -24,7 +22,7 @@ public class ProductKindDto {
 
     private Long discountPercentage;
 
-    private Long rating;
+    private Double rating;
 
     private Long stock;
 
@@ -32,7 +30,7 @@ public class ProductKindDto {
 
     private String sku;
 
-    private Long weight;
+    private Double weight;
 
     private String warrantyInformation;
 
@@ -44,7 +42,8 @@ public class ProductKindDto {
 
     private Integer minimumOrderQuantity;
 
-    private String thumbnail;
+    private MultipartFile thumbnail;
 
-    private Set<Kind> kinds;
+    private Integer category;
+
 }

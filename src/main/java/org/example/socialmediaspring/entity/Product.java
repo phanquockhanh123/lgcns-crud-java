@@ -1,8 +1,6 @@
 package org.example.socialmediaspring.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Fetch;
@@ -16,6 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "products")
 public class Product {
     @Id
@@ -36,7 +35,7 @@ public class Product {
     private Long discountPercentage;
 
     @Column(name="rating")
-    private Long rating;
+    private Double rating;
 
     @Column(name="stock")
     private Long stock;
@@ -48,7 +47,7 @@ public class Product {
     private String sku;
 
     @Column(name="weight")
-    private Long weight;
+    private Double weight;
 
     @Column(name="warranty_information")
     private String warrantyInformation;
@@ -68,6 +67,9 @@ public class Product {
     @Column(name="thumbnail")
     private String thumbnail;
 
+    @Column(name="category_id")
+    private Integer categoryId;
+
     @Column(name = "created")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date created;
@@ -86,17 +88,5 @@ public class Product {
     private  void onUpdate() {
         this.modified = new Date();
     }
-
-    @ManyToMany(fetch =  FetchType.LAZY, cascade = CascadeType.ALL)
-    @Fetch(FetchMode.JOIN)
-    @JoinTable(name="kind_products",
-        joinColumns = {
-            @JoinColumn(name="product_id", referencedColumnName = "id")
-        },
-        inverseJoinColumns = {
-            @JoinColumn(name="kind_id", referencedColumnName = "id")
-        })
-    @JsonManagedReference
-    private Set<Kind> kinds;
 
 }

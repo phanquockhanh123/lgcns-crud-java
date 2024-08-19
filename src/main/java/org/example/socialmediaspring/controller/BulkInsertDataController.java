@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("api/v1/public")
 @RequiredArgsConstructor
 @Slf4j

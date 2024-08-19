@@ -5,12 +5,14 @@ import org.example.socialmediaspring.common.ResponseFactory;
 import org.example.socialmediaspring.dto.category.CategoryRequest;
 import org.example.socialmediaspring.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/admin/categories")
+@CrossOrigin("*")
+@RequestMapping("/admin/categories")
 @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'USER')")
 public class CategoryController {
     @Autowired
@@ -18,6 +20,14 @@ public class CategoryController {
 
     @Autowired
     ResponseFactory responseFactory;
+
+
+    @Value("${coach.name}")
+    private String coachName;
+
+
+    @Value("${member.name}")
+    private String memberName;
 
     @PostMapping
     @PreAuthorize("hasAuthority('admin:create')")
@@ -55,4 +65,9 @@ public class CategoryController {
         return responseFactory.success(categoryService.getCategoryById(id));
     }
 
+    @GetMapping("/health")
+    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read', 'user:read')")
+    public String findAllCategories() {
+        return coachName + " study many knowledge " + memberName;
+    }
 }

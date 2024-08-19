@@ -145,7 +145,7 @@ public class BookServiceImpl implements BookService {
 
         }
 
-        // check empty object list cateids
+        // check empty object list cateIds
         if (request.getCateIds() == null || request.getCateIds().isEmpty()) {
             throw new BizException(ErrorCodeConst.INVALID_INPUT,"No category name has been chosen");
         }

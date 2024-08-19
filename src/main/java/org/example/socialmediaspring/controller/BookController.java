@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("api/v1/admin/books")
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")

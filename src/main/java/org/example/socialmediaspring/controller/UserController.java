@@ -22,7 +22,8 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/admin/users")
+@CrossOrigin("*")
+@RequestMapping("/admin/users")
 @Slf4j
 @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
 public class UserController {

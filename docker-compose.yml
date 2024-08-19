@@ -1,0 +1,31 @@
+version: "3.7"
+services:
+  api_service:
+    build: .
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - lgcns-crud-java
+    environment:
+      - spring.datasource.url=jdbc:mysql://localhost:3306/social-media?useSSL=false
+    depends_on:
+      - mysqldb
+
+    volumes:
+      - .m2:/root/.m2
+
+  mysqldb:
+    image: "mysql:8.0"
+    restart: always
+    ports:
+      - 3306:3306
+    networks:
+      - lgcns-crud-java
+    environment:
+      MYSQL_DATABASE: social-media
+      MYSQL_USER: admin
+      MYSQL_PASSWORD:
+      MYSQL_ROOT_PASSWORD:
+networks:
+  lgcns-crud-java:

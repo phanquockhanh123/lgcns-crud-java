@@ -7,6 +7,8 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -64,9 +66,6 @@ public class Product {
     @Column(name="minimum_order_quantity")
     private Integer minimumOrderQuantity;
 
-    @Column(name="thumbnail")
-    private String thumbnail;
-
     @Column(name="category_id")
     private Integer categoryId;
 
@@ -89,4 +88,17 @@ public class Product {
         this.modified = new Date();
     }
 
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @JsonIgnore
+    @JoinTable(
+            name = "category_products",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<Category> categories = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product",
+            cascade = {
+                    CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
+    private  List<Files> files;
 }

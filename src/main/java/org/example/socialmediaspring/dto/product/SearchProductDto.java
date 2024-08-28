@@ -39,8 +39,6 @@ public class SearchProductDto {
 
     private Integer minimumOrderQuantity;
 
-    private String thumbnail;
-
     private Integer categoryId;
 
     private String categoryName;

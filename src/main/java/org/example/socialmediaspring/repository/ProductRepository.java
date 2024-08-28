@@ -20,7 +20,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query(value = "SELECT new org.example.socialmediaspring.dto.product.SearchProductDto(p.id, p.title, p.description, p.price, p.discountPercentage," +
             " p.rating, p.stock, p.brand, p.sku, p.weight, p.warrantyInformation," +
             " p.shippingInformation, p.availabilityStatus, p.returnPolicy, p.minimumOrderQuantity," +
-            " p.thumbnail, c.id, c.name)  FROM Product p " +
+            " c.id, c.name)  FROM Product p " +
             " INNER JOIN Category c " +
             " ON p.categoryId = c.id " +
             " WHERE p.id = :id ")

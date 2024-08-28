@@ -23,7 +23,7 @@ import java.util.UUID;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("api/v1/admin/book_transactions")
+@RequestMapping("/api/v1/admin/book_transactions")
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'USER')")
 public class BookTransactionController {

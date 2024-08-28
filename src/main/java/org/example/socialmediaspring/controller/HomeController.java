@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Locale;
 
 @RestController
-@RequestMapping("api/v1")
 @RequiredArgsConstructor
 public class HomeController {
 

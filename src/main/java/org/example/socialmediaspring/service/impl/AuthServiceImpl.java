@@ -3,6 +3,7 @@ package org.example.socialmediaspring.service.impl;
 import jakarta.persistence.EntityExistsException;
 import org.example.socialmediaspring.config.JWTUtils;
 import org.example.socialmediaspring.constant.ErrorCodeConst;
+import org.example.socialmediaspring.dto.auth.AuthRes;
 import org.example.socialmediaspring.dto.auth.ChangePasswordRequest;
 import org.example.socialmediaspring.dto.common.ReqRes;
 import org.example.socialmediaspring.dto.emails.EmailDetails;
@@ -43,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
     EmailService emailService;
 
     @Override
-    public ReqRes signUp(ReqRes registrationRequest) {
+    public ReqRes signUp(AuthRes registrationRequest) {
         ReqRes resp = new ReqRes();
         try {
             if (userRepository.existsByEmail(registrationRequest.getEmail())) {
@@ -92,7 +93,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ReqRes signIn(ReqRes signinRequest) {
+    public ReqRes signIn(AuthRes signinRequest) {
         ReqRes response = new ReqRes();
 
         try {

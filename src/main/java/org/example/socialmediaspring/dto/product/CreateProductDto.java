@@ -42,8 +42,6 @@ public class CreateProductDto {
 
     private Integer minimumOrderQuantity;
 
-    private MultipartFile thumbnail;
-
     private Integer category;
 
 }

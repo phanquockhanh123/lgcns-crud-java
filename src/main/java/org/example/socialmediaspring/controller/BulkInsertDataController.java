@@ -19,7 +19,7 @@ import java.io.IOException;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("api/v1/public")
+@RequestMapping("/api/v1/public")
 @RequiredArgsConstructor
 @Slf4j
 public class BulkInsertDataController {

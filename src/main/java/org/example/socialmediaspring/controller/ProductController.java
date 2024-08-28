@@ -9,7 +9,9 @@ import org.example.socialmediaspring.dto.product.CUProductRequest;
 import org.example.socialmediaspring.dto.product.CreateProductDto;
 import org.example.socialmediaspring.dto.product.SearchProductRequest;
 import org.example.socialmediaspring.entity.Product;
+import org.example.socialmediaspring.service.FilesService;
 import org.example.socialmediaspring.service.ProductService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/admin/products")
+@RequestMapping("/api/v1/admin/products")
 @CrossOrigin("*")
 @RequiredArgsConstructor
 
@@ -28,6 +30,8 @@ public class ProductController {
     private final ProductService productService;
 
     private final ResponseFactory responseFactory;
+
+    private  final FilesService filesService;
 
     @PostMapping(path = "/create", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     @PreAuthorize("hasAnyAuthority('admin:update', 'manager:update')")
@@ -60,7 +64,6 @@ public class ProductController {
     }
 
     @GetMapping("/detail/{id}")
-    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read', 'user:read')")
     public ResponseEntity getProduct(@PathVariable Long id) {
         return responseFactory.success(productService.getProductById(id));
     }
@@ -69,5 +72,17 @@ public class ProductController {
     @PreAuthorize("hasAnyAuthority('admin:delete', 'manager:delete')")
     public ResponseEntity deleteProductsByIds(@RequestBody LongIdsRequest ids) {
         return responseFactory.success(productService.deleteProductsByIds(ids));
+    }
+
+    @GetMapping("/detail/mapping/{id}")
+    public ResponseEntity getProductDetail(@PathVariable Long id) {
+        return responseFactory.success(productService.getProductDetail(id));
+    }
+
+    @GetMapping("/getFileByName/{fileName}")
+    public ResponseEntity<byte[]> getImage(@PathVariable String fileName) {
+        byte[] imageData = filesService.getFiles(fileName);
+
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/png")).body(imageData);
     }
 }

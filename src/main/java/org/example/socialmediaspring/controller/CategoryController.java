@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/admin/categories")
+@RequestMapping("/api/v1/admin/categories")
 @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'USER')")
 public class CategoryController {
     @Autowired
@@ -32,6 +32,7 @@ public class CategoryController {
     @PostMapping
     @PreAuthorize("hasAuthority('admin:create')")
     public ResponseEntity createCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
+        System.out.println("Controller create category");
         return responseFactory.success(categoryService.createCategory(categoryRequest));
     }
 
@@ -69,5 +70,11 @@ public class CategoryController {
     @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read', 'user:read')")
     public String findAllCategories() {
         return coachName + " study many knowledge " + memberName;
+    }
+
+    @GetMapping("/products/{id}")
+    @PreAuthorize("hasAnyAuthority('admin:read', 'manager:read')")
+    public ResponseEntity getCategoryitsProduct(@PathVariable Integer id) {
+        return responseFactory.success(categoryService.getCategoryProducts(id));
     }
 }

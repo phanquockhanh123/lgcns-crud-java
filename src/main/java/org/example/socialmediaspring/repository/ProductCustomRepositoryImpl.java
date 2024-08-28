@@ -111,7 +111,6 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository{
                 .append("p.availabilityStatus, ")
                 .append("p.returnPolicy, ")
                 .append("p.minimumOrderQuantity, ")
-                .append("p.thumbnail, ")
                 .append("c.id, ")
                 .append("c.name ")
                 .append(") ")

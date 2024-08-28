@@ -4,8 +4,6 @@ import org.example.socialmediaspring.dto.book.BookCategoryDto;
 import org.example.socialmediaspring.dto.book.BookRequest;
 import org.example.socialmediaspring.dto.book.BookResponse;
 import org.example.socialmediaspring.entity.Book;
-import org.example.socialmediaspring.entity.BookCategory;
-import org.example.socialmediaspring.utils.ImageUtils;
 import org.springframework.stereotype.Service;
 
 @Service

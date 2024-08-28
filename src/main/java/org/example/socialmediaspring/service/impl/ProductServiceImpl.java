@@ -1,6 +1,8 @@
 package org.example.socialmediaspring.service.impl;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.common.IsbnGenerator;
@@ -21,6 +23,7 @@ import org.example.socialmediaspring.repository.CategoryRepository;
 import org.example.socialmediaspring.repository.ProductCustomRepository;
 import org.example.socialmediaspring.repository.ProductCustomRepositoryImpl;
 import org.example.socialmediaspring.repository.ProductRepository;
+import org.example.socialmediaspring.service.FilesService;
 import org.example.socialmediaspring.service.ProductService;
 import org.example.socialmediaspring.utils.FileUploadUtil;
 import org.example.socialmediaspring.utils.JsonUtils;
@@ -35,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -46,6 +50,9 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepository;
 
     @Autowired
+    private EntityManager entityManager;
+
+    @Autowired
     private CategoryRepository categoryRepository;
 
     private final ProductCustomRepositoryImpl productCustomRepositoryImpl;
@@ -54,8 +61,13 @@ public class ProductServiceImpl implements ProductService {
 
     private final IsbnGenerator isbnGenerator;
 
+    @Autowired
+    private FilesService filesService;
+
     @Override
-    public CreateProductDto saveProduct(CUProductRequest productDto, MultipartFile thumbnail) {
+    public CreateProductDto saveProduct(CUProductRequest productDto, MultipartFile thumbnail) throws IOException {
+        log.info("Enter into uploadFilesIntoDB method");
+
         if (thumbnail == null || thumbnail.isEmpty()) {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "No file choose");
         }
@@ -68,7 +80,6 @@ public class ProductServiceImpl implements ProductService {
         Category category = categoryRepository.findById(productDto.getCategory())
                 .orElseThrow(() -> new BizException(ErrorCodeConst.INVALID_INPUT,"Category not found"));
 
-        String fileName = StringUtils.cleanPath(Objects.requireNonNull(thumbnail.getOriginalFilename()));
         Product product = new Product();
         product.setTitle(productDto.getTitle());
         product.setDescription(productDto.getDescription());
@@ -84,14 +95,13 @@ public class ProductServiceImpl implements ProductService {
         product.setAvailabilityStatus(productDto.getAvailabilityStatus());
         product.setReturnPolicy(productDto.getReturnPolicy());
         product.setMinimumOrderQuantity(productDto.getMinimumOrderQuantity());
-        product.setThumbnail(fileName);
         product.setCategoryId(productDto.getCategory());
 
         Product newProduct = productRepository.save(product);
 
-        String uploadDir = "src/main/resources/static/public/book-images/" + product.getId();
+        String fileName = filesService.storeDataIntoFileSystem(thumbnail, product);
 
-        FileUploadUtil.saveFile(uploadDir, fileName, thumbnail);
+        log.info("Completed uploadFilesIntoDB method with response {}", fileName);
 
         return productMapper.toProductDto(newProduct);
 
@@ -107,8 +117,6 @@ public class ProductServiceImpl implements ProductService {
         List<SearchProductDto> listProducts = productsData.getSecond();
 
         Page<SearchProductDto> pageProductData = new PageImpl<>(listProducts, pageable, countProducts);
-
-
 
         PageNewResponse<SearchProductDto> ib = PageNewResponse.<SearchProductDto>builder()
                 .data(listProducts)
@@ -143,6 +151,21 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Product getProductDetail(Long id) {
+        TypedQuery<Product> query = entityManager.createQuery(
+                "select p from  Product p "
+                + "JOIN FETCH p.categories "
+                + "where p.id = :data", Product.class
+        );
+
+        query.setParameter("data", id);
+
+        Product product = query.getSingleResult();
+
+        return product;
+    }
+
+    @Override
     public CreateProductDto updateProduct(Long id,CUProductRequest request, MultipartFile thumbnail) {
         // check product exists in db
         Product existsProduct = productRepository.findById(id)
@@ -159,17 +182,6 @@ public class ProductServiceImpl implements ProductService {
             }
         });
 
-        // check null filePath
-        if (thumbnail != null && !thumbnail.isEmpty()) {
-            String fileName = StringUtils.cleanPath(thumbnail.getOriginalFilename());
-
-            existsProduct.setThumbnail(fileName);
-
-            String uploadDir = "src/main/resources/static/public/book-images/" + existsProduct.getId();
-
-            FileUploadUtil.saveFile(uploadDir, fileName, thumbnail);
-
-        }
 
         existsProduct.setTitle(request.getTitle());
         existsProduct.setDescription(request.getDescription());

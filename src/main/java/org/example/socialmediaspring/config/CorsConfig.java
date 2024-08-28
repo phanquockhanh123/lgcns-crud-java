@@ -38,8 +38,8 @@ public class CorsConfig {
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
                 registry.addResourceHandler("/static/public/**")
-                        .addResourceLocations("file:///C:/Users/63200332/Downloads/lgcns/lgcns-crud-java/src/main/resources/static/public/")
-                        .addResourceLocations("file:///D:/lgcns/lgcns-crud-java/src/main/resources/static/public/");
+                        .addResourceLocations("file:///C:/Users/63200332/Downloads/lgcns/lgcns-crud-java/src/main/resources/static/public/**")
+                        .addResourceLocations("file:///D:/lgcns/lgcns-crud-java/src/main/resources/static/public/**");
             }
         };
 

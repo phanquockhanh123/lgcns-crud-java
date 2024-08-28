@@ -41,7 +41,6 @@ public class ProductDto {
 
     private Integer minimumOrderQuantity;
 
-    private String thumbnail;
 
     private String categoryName;
 }

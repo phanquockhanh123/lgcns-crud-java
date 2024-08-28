@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 import org.example.socialmediaspring.entity.User;
+
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)

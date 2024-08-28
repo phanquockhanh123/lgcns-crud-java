@@ -11,7 +11,7 @@ import org.example.socialmediaspring.common.BaseEntity;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
+@Builder
 @Entity
 @Table(name = "books")
 public class Book extends BaseEntity {

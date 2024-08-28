@@ -6,10 +6,11 @@ import org.example.socialmediaspring.dto.product.*;
 import org.example.socialmediaspring.entity.Product;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface ProductService {
-    CreateProductDto saveProduct(CUProductRequest productDto, MultipartFile thumbnail);
+    CreateProductDto saveProduct(CUProductRequest productDto, MultipartFile thumbnail) throws IOException;
 
     CreateProductDto updateProduct(Long id,CUProductRequest productDto, MultipartFile thumbnail);
 
@@ -18,4 +19,6 @@ public interface ProductService {
     PageNewResponse<SearchProductDto> findAllProducts(SearchProductRequest request);
 
     String deleteProductsByIds(LongIdsRequest request);
+
+    Product getProductDetail(Long id);
 }

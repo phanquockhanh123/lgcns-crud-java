@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/admin/reports")
+@RequestMapping("/api/v1/admin/reports")
 @PreAuthorize("hasAnyAuthority('ADMIN')")
 public class ReportController {
     @Autowired

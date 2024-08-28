@@ -17,4 +17,6 @@ public interface CategoryService {
 
     Category getCategoryById(Integer id);
 
+    Category getCategoryProducts(Integer id);
+
 }

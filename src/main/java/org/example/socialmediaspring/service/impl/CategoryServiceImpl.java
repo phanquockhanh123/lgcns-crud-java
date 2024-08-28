@@ -1,6 +1,8 @@
 package org.example.socialmediaspring.service.impl;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.common.PageResponse;
@@ -8,11 +10,13 @@ import org.example.socialmediaspring.constant.ErrorCodeConst;
 import org.example.socialmediaspring.dto.category.CategoryRequest;
 import org.example.socialmediaspring.entity.Book;
 import org.example.socialmediaspring.entity.Category;
+import org.example.socialmediaspring.entity.Product;
 import org.example.socialmediaspring.exception.BizException;
 import org.example.socialmediaspring.repository.BookRepository;
 import org.example.socialmediaspring.repository.CategoryRepository;
 import org.example.socialmediaspring.service.CategoryService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,9 +35,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     private  final BookRepository bookRepository;
 
+    @Autowired
+    private EntityManager entityManager;
 
     @Override
     public Category createCategory(CategoryRequest request) {
+        System.out.println("Service create category");
         if (categoryRepository.existsByName(request.getName())) {
             throw new BizException(ErrorCodeConst.INVALID_INPUT, "Category name existed");
         }
@@ -99,6 +106,22 @@ public class CategoryServiceImpl implements CategoryService {
             throw new EntityNotFoundException("User not existed");
         }
         Category category = categoryRepository.findBookById(id);
+
+        return category;
+    }
+
+    @Override
+    public Category getCategoryProducts(Integer id) {
+        TypedQuery<Category> query = entityManager.createQuery(
+                "select c from  Category c "
+                        + "JOIN FETCH c.products "
+                        + "where c.id = :data", Category.class
+        );
+
+        query.setParameter("data", id);
+
+        Category category = query.getSingleResult();
+
 
         return category;
     }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -22,4 +23,5 @@ public class PageResponse<T> {
     private int totalPages;
     private boolean first;
     private boolean last;
+
 }

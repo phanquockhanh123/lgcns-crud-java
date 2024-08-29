@@ -1,5 +1,6 @@
 package org.example.socialmediaspring.exception;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.example.socialmediaspring.constant.ErrorCodeConst;
@@ -10,6 +11,8 @@ import java.util.Locale;
 
 @Getter
 @Slf4j
+@Data
+
 public class BizException  extends RuntimeException{
     protected String source;
     private final String[] arguments;

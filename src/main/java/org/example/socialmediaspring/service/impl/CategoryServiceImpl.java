@@ -103,7 +103,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category getCategoryById(Integer id) {
         if (!categoryRepository.existsById(id)) {
-            throw new EntityNotFoundException("User not existed");
+            throw new BizException(ErrorCodeConst.INVALID_INPUT, "Category not existed");
         }
         Category category = categoryRepository.findBookById(id);
 
